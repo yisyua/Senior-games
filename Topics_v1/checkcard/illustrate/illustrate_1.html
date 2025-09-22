@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>遊戲規則說明</title>
+  <link rel="stylesheet" href="static/style.css">
+</head>
+<style>
+ .user-info {
+  position: absolute;
+  top: 20px;
+  right: 30px;
+  font-size: 40px;
+  color: #333;
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  font-family: "華康兒風體W3";
+}
+
+.user-info button {
+  padding: 6px 12px;
+  background-color: #CECEFF;
+  border: none;
+  border-radius: 8px;
+  size: 40px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: background-color 0.3s ease;
+  font-family: "華康兒風體W3";
+}
+
+.user-info button:hover {
+  background-color: #b2b2ff;
+}
+
+</style>
+<body>
+  <div class="container">
+    <header>
+      <h1>遊戲規則</h1>
+    </header>
+      <ol class="rule-list">
+        <li>畫面上會出現一個 3×5 的方格，共 15 個數字</li>
+        <li>所有格子中，只有一組數字是重複的（例如有兩個「27」）</li>
+        <li>觀察整個畫面，找出並點選那兩個相同的數字</li>
+        <li>點選正確後會得分，將自動進入下一題</li>
+      </ol>
+
+    <div class="arrow-wrapper">
+      <span class="arrow-button" onclick="location.href='illustrate_pi1.html'">❯</span>
+      <span class="arrow-button1" onclick="location.href='../checkcardstart.html'">❮</span>
+      <span class="back-button" onclick="location.href='../checkcardstart.html'">X</span>
+    </div>
+  </div>
+<script>
+      const username = localStorage.getItem("nickname") || "訪客";
+      document.getElementById("username").textContent = `您好，${username}`;
+
+      function logout() {
+        localStorage.clear(); // 一鍵清除所有 localStorage 資料
+       location.href = "../index.html"; // 替換成你的登入頁路徑
+      }
+        function exportGameData() {
+    const records = JSON.parse(localStorage.getItem("gameResults") || "[]");
+    if (records.length === 0) {
+      alert("沒有遊戲紀錄可匯出！");
+      return;
+    }
+
+    const ws = XLSX.utils.json_to_sheet(records);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, "遊戲紀錄");
+    XLSX.writeFile(wb, "game_results.xlsx");
+
+    // 清空遊戲紀錄（如果你要保留就註解這行）
+    localStorage.removeItem("gameResults");
+  }
+    </script>
+</body>
+</html>
+
+
+

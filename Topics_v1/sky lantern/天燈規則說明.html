@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>遊戲規則說明</title>
+  <link rel="stylesheet" href="static/style.css">
+</head>
+<style>
+.arrow-wrapper1 {
+  position: fixed;
+  top: 20px;
+  left: 20px;
+}
+.back-button {
+  position: absolute;
+  top: 30px;
+  left: 30px;
+  background-color: #ffffff;
+  color: rgb(0, 0, 0);
+  border: none;
+  padding: 12px 25px;
+  font-size: 50px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.back-button:hover {
+  background-color: #ffffff;
+}
+</style>
+<body>
+  <div class="container">
+    <header>
+      <h1 style="font-size: 50px;">遊戲規則</h1>
+    </header>
+
+    <section class="rule-container">
+      <ol class="rule-list">
+        <li style="font-size: 25px;">在 60 秒內盡可能點擊更多天燈，爭取最高分</li>
+        <li style="font-size: 25px;">連續點擊天燈，連擊數會增加。</li>
+        <li style="font-size: 25px;">點擊失誤或漏掉天燈，連擊會中斷歸零。</li>
+        <li style="font-size: 25px;">遊戲時間為 60 秒，時間結束時，遊戲會自動停止</li>
+      </ol>
+    </section>
+    <div class="arrow-wrapper">
+      <span class="arrow-button" onclick="location.href='遊戲解說.html'">❯</span>
+      <span class="arrow-button1" onclick="location.href='Home screen.html'">❮</span>
+    </div>
+
+    <div class="arrow-wrapper1">
+        <span class="back-button" onclick="location.href='Home screen.html'">X</span>
+    </div>
+  </div>
+</body>
+</html>

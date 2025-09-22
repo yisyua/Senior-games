@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8" />
+  <title>數字連線</title>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC&display=swap" rel="stylesheet">
+  <style>
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      padding: 0;
+      height: 100vh;
+      background: #f2f6fc;
+      font-family: "標楷體", "Microsoft JhengHei", "Noto Sans TC", sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+
+    header h1 {
+      margin-bottom: 10px;
+      font-size: 36px;
+      color: #2c3e50;
+      text-shadow: 1px 1px 3px rgba(0,0,0,0.1);
+    }
+
+    #container {
+      position: relative;
+      width: 500px;
+      height: 800px;
+      overflow: hidden;
+      user-select: none;
+      margin-bottom: 20px;
+    }
+
+    .node {
+      position: absolute;
+      width: 60px;
+      height: 60px;
+      background: #ecf0f1;
+      border: 2px solid #2c3e50;
+      border-radius: 50%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 50px;
+      font-weight: bold;
+      color: #2c3e50;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    .node:hover {
+      background: #d0e6f7;
+      transform: scale(1.1);
+    }
+
+    .node.active {
+      background: #dcdcdc;       /* 更淺的灰 */
+      color: #7f8c8d;
+      border-color: #bfbfbf;
+      transform: scale(1);
+      box-shadow: none;
+      opacity: 0.6;
+    }
+
+    canvas {
+      position: absolute;
+      left: 0;
+      top: 0;
+      pointer-events: none;
+    }
+
+    #message {
+      font-size: 50px;
+      font-weight: bold;
+      color: #34495e;
+      text-align: center;
+      animation: fadeIn 0.4s ease;
+      margin-top: 10px;
+      min-height: 60px;
+      user-select: none;
+    }
+
+    #errorMessage {
+      font-size: 18px;
+      font-weight: bold;
+      color: red;
+      text-align: center;
+      height: 30px;
+      margin-top: 5px;
+      opacity: 0;
+      transition: opacity 0.6s ease;
+      user-select: none;
+      min-height: 30px;
+      display: none; /* 這裡隱藏，改用 message 顯示錯誤 */
+    }
+
+    #hintBtn {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      z-index: 100;
+      padding: 14px 20px;
+      font-size: 18px;
+      font-family: 'Noto Sans TC', sans-serif;
+      background-color: #e67e22;
+      color: white;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+      transition: background-color 0.3s ease, transform 0.2s ease;
+    }
+
+    #hintBtn:hover:enabled {
+      background-color: #d35400;
+      transform: scale(1.05);
+    }
+
+    #hintBtn:disabled {
+      background-color: #bdc3c7;
+      cursor: not-allowed;
+    }
+
+    @keyframes flash {
+    0%, 100% {
+      box-shadow: 0 0 10px 5px rgba(255, 255, 0, 0.6); /* 黃色發光 */
+      background-color: #fdfd96; /* 淺黃色背景 */
+      border-color: #f1c40f;
+      transform: scale(1.15);
+    }
+    50% {
+      box-shadow: 0 0 20px 10px rgba(255, 255, 0, 0.9);
+      background-color: #fff700; /* 更亮的黃色 */
+      border-color: #f39c12;
+      transform: scale(1.25);
+    }
+  }
+  .hint-flash {
+    animation: flash 0.8s ease-in-out 3;
+    z-index: 10;
+  }
+
+
+  </style>
+</head>
+<body>
+  <header>
+    <h1>數字連線</h1>
+    <button id="hintBtn" onclick="showHint()">提示</button>
+  </header>
+  
+  <div id="message"></div>
+  <div id="errorMessage"></div> <!-- 這個區塊目前沒使用，但保留 -->
+
+  <div id="container">
+    <canvas id="lineCanvas"></canvas>
+  </div>
+
+  <script>
+    const container = document.getElementById('container');
+    const message = document.getElementById('message');
+    const errorMessage = document.getElementById('errorMessage');
+    const canvas = document.getElementById('lineCanvas');
+    const ctx = canvas.getContext('2d');
+    const hintBtn = document.getElementById('hintBtn');
+
+    let currentLevel = 1;
+    let nodes = [];
+    let currentIndex = 0;
+    let startTime;
+    let levelTimes = [];
+
+    // 錯誤次數與提示次數改為全遊戲累積，不重置
+    let wrongClicks = 0;
+    let hintCount = 0;
+
+    let cooldownTimer;
+
+    // 儲存並更新關卡基礎訊息
+    let baseMessage = '';
+
+    function resizeCanvas(){
+      canvas.width = container.clientWidth;
+      canvas.height = container.clientHeight;
+    }
+    resizeCanvas();
+    window.addEventListener('resize', resizeCanvas);
+
+    function clearCanvas(){
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+    }
+
+    function drawLines(){
+      clearCanvas();
+      if(currentIndex < 2) return;
+
+      ctx.strokeStyle = '#27ae60';
+      ctx.lineWidth = 3;
+      ctx.beginPath();
+      for(let i = 0; i < currentIndex; i++){
+        const node = nodes[i];
+        const x = node.x + node.size / 2;
+        const y = node.y + node.size / 2;
+        if(i === 0){
+          ctx.moveTo(x, y);
+        } else {
+          ctx.lineTo(x, y);
+        }
+      }
+      ctx.stroke();
+    }
+
+    function randomPosition(size, width, height){
+      const x = Math.random() * (width - size);
+      const y = Math.random() * (height - size);
+      return {x, y};
+    }
+
+    function startCooldown() {
+   
+      hintBtn.disabled = false;
+      hintBtn.textContent = '提示';
+    }
+
+    function showHint() {
+      if (hintBtn.disabled) return; // 冷卻中不能按
+
+      if (currentIndex >= nodes.length) return;
+      const nextNode = nodes[currentIndex];
+      nextNode.element.classList.add('hint-flash');
+      setTimeout(() => {
+        nextNode.element.classList.remove('hint-flash');
+      }, 2000);
+
+      hintCount++; // 提示次數+1
+      updateErrorMessage(`提示次數：${hintCount}`, false);
+
+      startCooldown();
+    }
+
+    // 提示次數訊息會顯示在錯誤訊息區（綠色）
+    // 你如果不想顯示，可以註解掉下面兩行
+    function updateErrorMessage(text, isError = true) {
+      errorMessage.textContent = text;
+      if (isError) {
+        errorMessage.style.color = 'red';
+      } else {
+        errorMessage.style.color = 'green';
+      }
+      errorMessage.style.opacity = '1';
+
+      clearTimeout(errorMessage._timeout);
+      errorMessage._timeout = setTimeout(() => {
+        errorMessage.style.opacity = '0';
+      }, 3000);
+    }
+
+    // 顯示錯誤訊息在 message，3秒後恢復成 baseMessage
+    function showErrorOnMessage(text){
+      message.textContent = text;
+      clearTimeout(message._timeout);
+      message._timeout = setTimeout(() => {
+        message.textContent = baseMessage;
+      }, 3000);
+    }
+
+    // 點對時恢復原本訊息
+    function restoreBaseMessage(){
+      clearTimeout(message._timeout);
+      message.textContent = baseMessage;
+    }
+
+    hintBtn.addEventListener('click', showHint);
+
+    function createLevel(level) {
+      container.querySelectorAll('.node').forEach(n => n.remove());
+      nodes = [];
+      currentIndex = 0;
+      clearCanvas();
+
+      let nodeCount = 5;
+      if(level === 2) nodeCount = 10;
+      else if(level === 3) nodeCount = 15;
+      else if(level === 4) nodeCount = 20;
+
+      baseMessage = `第 ${level} 關，請依序點擊數字`;
+      message.textContent = baseMessage;
+      startTime = new Date();
+
+      // 這兩行已註解，錯誤次數與提示次數不重置
+      // wrongClicks = 0; // 新關錯誤次數歸零
+      // hintCount = 0;   // 新關提示次數歸零
+      updateErrorMessage(''); // 清除錯誤訊息
+
+      const nodeSize = 50;
+      const minDistance = nodeSize + 25;
+
+      function isFarEnough(x, y){
+        return nodes.every(n => {
+          const dx = n.x - x;
+          const dy = n.y - y;
+          return Math.sqrt(dx * dx + dy * dy) >= minDistance;
+        });
+      }
+
+      for(let i = 1; i <= nodeCount; i++){
+        let pos, tries = 0;
+        do {
+          pos = randomPosition(nodeSize, container.clientWidth, container.clientHeight);
+          tries++;
+          if(tries > 1000) break;
+        } while(!isFarEnough(pos.x, pos.y));
+
+        const nodeEl = document.createElement('div');
+        nodeEl.className = 'node';
+        nodeEl.textContent = i;
+        nodeEl.style.left = pos.x + 'px';
+        nodeEl.style.top = pos.y + 'px';
+        container.appendChild(nodeEl);
+
+        nodes.push({
+          value: i,
+          x: pos.x,
+          y: pos.y,
+          size: nodeSize,
+          element: nodeEl
+        });
+
+        nodeEl.addEventListener('click', () => {
+  if (i === currentIndex + 1) {
+    nodeEl.classList.add('active');
+    currentIndex++;
+    drawLines();
+    restoreBaseMessage(); // 點對時恢復正常訊息
+
+    if (currentIndex === nodeCount) {
+      const endTime = new Date();
+      const duration = ((endTime - startTime) / 1000).toFixed(2);
+
+      levelTimes.push({ level: currentLevel, time: parseFloat(duration), wrongClicks, hintCount });
+
+      // 儲存每關時間到 localStorage
+      if (currentLevel === 1) {
+        localStorage.setItem('duration', duration);
+        localStorage.setItem('hintCount', hintCount);
+      } else if (currentLevel === 2) {
+        localStorage.setItem('duration1', duration);
+        localStorage.setItem('hintCount1', hintCount);
+      } else if (currentLevel === 3) {
+        localStorage.setItem('duration2', duration);
+        localStorage.setItem('hintCount2', hintCount);
+      } else if (currentLevel === 4) {
+        localStorage.setItem('duration3', duration);
+        localStorage.setItem('hintCount3', hintCount);
+      }
+
+      // 如果是最後一關，儲存錯誤次數與提示次數
+      if (currentLevel === 4) {
+        localStorage.setItem('wrongClicks', wrongClicks);
+      }
+
+      if (currentLevel < 4) {
+        message.textContent = `🎉 第 ${currentLevel} 關完成！3 秒後進入下一關...`;
+        setTimeout(() => {
+          currentLevel++;
+          createLevel(currentLevel);
+          startCooldown();
+        }, 3000);
+      } else {
+        window.location.href = `../numberend.html`;
+      }
+    }
+  } else {
+    wrongClicks++;
+
+    // 更新上方提示文字
+    message.textContent = `錯誤！請點選 ${currentIndex + 1}`;
+
+    clearTimeout(message._timeout);
+    message._timeout = setTimeout(() => {
+      message.textContent = baseMessage;
+    }, 3000);
+  }
+});
+
+      }
+    }
+
+    // 遊戲初始化
+    createLevel(currentLevel);
+    startCooldown();
+  </script>
+</body>
+</html>

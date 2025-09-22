@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>遊戲結果</title>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    html, body {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      overflow: hidden;
+      font-family: "標楷體", "Microsoft JhengHei", "Noto Sans TC", sans-serif;
+      background-color: #f9fbfc;
+      color: #000;
+    }
+
+    body {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      padding: 1rem;
+      min-height: 100vh;
+    }
+
+    .user-info {
+      position: fixed;
+      top: 1rem;
+      right: 1rem;
+      font-size: 1.5rem;
+      background-color: #ffffffcc;
+      padding: 1rem;
+      border-radius: 12px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+      display: flex;
+      align-items: center;
+      max-width: 300px;
+      overflow: hidden;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+      z-index: 999;
+    }
+
+    .user-info button {
+      margin-left: 1rem;
+      font-size: 1.2rem;
+      padding: 0.6rem 1.2rem;
+      border: none;
+      background-color: #e0e0e0;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background-color 0.2s ease;
+      user-select: none;
+    }
+
+    .user-info button:hover {
+      background-color: #ccc;
+    }
+
+    h1 {
+      font-size: 2.8rem;
+      margin-bottom: 2rem;
+      color: #667788;
+    }
+
+    .container {
+      background-color: #ffffff;
+      padding: 2.5rem 2rem;
+      border-radius: 20px;
+      width: 100%;
+      max-width: 600px;
+      text-align: center;
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
+      overflow: hidden;
+    }
+
+    .result-box1 {
+      font-size: 1.8rem;
+      margin-bottom: 2rem;
+      padding: 1.8rem;
+      border-radius: 15px;
+      background-color: #e6e6e6;
+      color: #444;
+      font-weight: bold;
+      word-break: break-word;
+    }
+
+    .buttons {
+      display: flex;
+      flex-direction: row;
+      justify-content: center;
+      gap: 1rem;
+      flex-wrap: wrap;
+      margin-top: 1.5rem;
+    }
+
+    .buttons button {
+      flex: 1 1 140px;
+      max-width: 180px;
+      font-size: 1.6rem;
+      padding: 1rem 1.2rem;
+      border: none;
+      border-radius: 12px;
+      cursor: pointer;
+      font-weight: bold;
+      color: #333;
+      background-color: #ddd;
+      font-family: "標楷體", "Microsoft JhengHei", "Noto Sans TC", sans-serif;
+      transition: background-color 0.2s ease;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      box-shadow: none;
+      user-select: none;
+    }
+
+    .buttons button:hover {
+      background-color: #ccc;
+    }
+
+    @media (max-width: 600px) {
+      h1 {
+        font-size: 2.2rem;
+      }
+      .result-box1 {
+        font-size: 1.4rem;
+        padding: 1.2rem;
+      }
+      .buttons button {
+        font-size: 1.4rem;
+        flex: 1 1 120px;
+        max-width: 150px;
+      }
+      .user-info {
+        font-size: 1.2rem;
+        max-width: 180px;
+        padding: 0.8rem;
+      }
+      .user-info button {
+        font-size: 1rem;
+        padding: 0.4rem 0.8rem;
+        margin-left: 0.5rem;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="user-info">
+    <span id="usernameDisplay">您好，玩家</span>
+    <button onclick="logout()">登出</button>
+  </div>
+
+  <div class="container">
+    <h1>遊戲結果</h1>
+    <div class="result-box1">
+      <div style="font-size: 25px;">排名：<span id="rank">—</span></div>
+      <div style="font-size: 25px;">最終分數：<span id="usedTime1">—</span> 分</div>
+    </div>
+
+    <div class="buttons">
+      <button class="exit-btn" onclick="location.href='練習版.html';clearGame()" id="test" style="display: none;">再練習</button>
+      <button class="exit-btn" onclick="location.href='index.html';clearGame()" id="test2" style="display: none;">進入測試</button>
+      <button class="exit-btn" onclick="location.href='../checkcard/checkcardstart.html';" id="play" style="display: none;">下一關</button>
+    </div>
+
+    <!-- Debug: 顯示目前等級 -->
+    <div style="margin-top: 1rem; font-size: 1rem;display: none;">
+      Level 狀態：<span id="levelStatus">（載入中...）</span>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+
+  <script>
+    const username = localStorage.getItem('nickname') || '玩家';
+    const hobby = localStorage.getItem('hobby') || localStorage.getItem('habit') || '未知';
+    let level = localStorage.getItem("test") || '練習'; // 預設為練習
+    const rank = localStorage.getItem("rank");
+
+    const score = parseFloat(localStorage.getItem('score')) || 0;
+    const accuracy = parseFloat(localStorage.getItem('accuracy')) || 0;
+    const avgCombo = parseFloat(localStorage.getItem('avgCombo')) || 0;
+    const mistakeRate = parseFloat(localStorage.getItem('mistakeRate')) || 0;
+    const totalCombos = parseFloat(localStorage.getItem('count')) || 0;
+    const failureRate = parseFloat(localStorage.getItem('failureRate')) || 0;
+    const hitBalloons = parseFloat(localStorage.getItem('hitBalloons')) || 0;
+    const missedLanterns = parseFloat(localStorage.getItem('missedLanterns')) || 0;
+    const totalTargets = parseFloat(localStorage.getItem('totalTargets')) || 0;
+
+    document.getElementById('usernameDisplay').textContent = `您好，${username}`;
+
+    document.getElementById("test2").addEventListener("click", function () {
+      level = "測驗";
+      localStorage.setItem("test", "測驗");
+      end();
+    });
+
+    function end() {
+      document.getElementById('rank').textContent = rank || '—';
+      document.getElementById('usedTime1').textContent = score;
+      document.getElementById('levelStatus').textContent = level;
+
+      if (level === "測驗") {
+        document.getElementById("play").style.display = "block";
+        document.getElementById("test").style.display = "none";
+        document.getElementById("test2").style.display = "none";
+        saveGameResultToNewTable();
+      } else if (level === "練習") {
+        document.getElementById("test").style.display = "block";
+        document.getElementById("test2").style.display = "block";
+        document.getElementById("play").style.display = "none";
+      }
+    }
+
+    window.onload = end;
+
+    function saveGameResultToNewTable() {
+      const now = new Date();
+      const timestamp = now.toISOString().replace(/[:.]/g, '-');
+      const newKey = `gameResult_${timestamp}`;
+
+      const newRecord = {
+        遊戲玩家名稱: username,
+        嗜好: hobby,
+        遊戲名稱: "點擊天燈",
+        遊戲關卡: level,
+        最終分數: score,
+        命中率: accuracy,
+        平均連擊: avgCombo,
+        錯誤率: mistakeRate,
+        失敗率: failureRate,
+        點中天燈: totalCombos,
+        誤點氣球: hitBalloons,
+        漏掉天燈: missedLanterns,
+        總天燈數: totalTargets,
+        建立時間: now.toLocaleString()
+      };
+
+      localStorage.setItem(newKey, JSON.stringify([newRecord]));
+
+      let tableList = JSON.parse(localStorage.getItem("gameTables") || "[]");
+
+      if (!newKey.includes("練習") && !tableList.includes(newKey)) {
+        tableList.push(newKey);
+        localStorage.setItem("gameTables", JSON.stringify(tableList));
+      }
+    }
+
+    function exportAllGameTables() {
+      const tableList = JSON.parse(localStorage.getItem("gameTables") || "[]");
+      const allRecords = [];
+
+      for (const key of tableList) {
+        const records = JSON.parse(localStorage.getItem(key) || "[]");
+        records.forEach(record => {
+          allRecords.push({ 表名: "點亮天燈", ...record });
+        });
+      }
+
+      if (allRecords.length === 0) {
+        alert("沒有資料可匯出！");
+        return;
+      }
+
+      const ws = XLSX.utils.json_to_sheet(allRecords);
+      const wb = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(wb, ws, "點亮天燈");
+      XLSX.writeFile(wb, `game_results_${username}.xlsx`);
+    }
+
+    function logout() {
+      localStorage.clear();
+      location.href = "../index.html";
+    }
+
+    function clearGame() {
+      const keysToClear = [
+        "score", "accuracy", "avgCombo",
+        "mistakeRate", "count", "failureRate",
+        "hitBalloons", "missedLanterns", "totalTargets"
+      ];
+      keysToClear.forEach(key => localStorage.removeItem(key));
+    }
+  </script>
+
+</body>
+</html>

@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8" />
+  <title>數字連線</title>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC&display=swap" rel="stylesheet" />
+  <style>
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      padding: 0;
+      height: 100vh;
+      background: #f2f6fc;
+      font-family: 'Noto Sans TC', sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      font-family: "標楷體", "Microsoft JhengHei", "Noto Sans TC", sans-serif;
+    }
+
+    header h1 {
+      margin-bottom: 10px;
+      font-size: 36px;
+      color: #2c3e50;
+      text-shadow: 1px 1px 3px rgba(0,0,0,0.1);
+    }
+
+    #container {
+      position: relative;
+      width: 500px;
+      height: 800px;
+      overflow: hidden;
+      user-select: none;
+      margin-bottom: 20px;
+    }
+
+    .node {
+      position: absolute;
+      width: 80px;
+      height: 80px;
+      background: #ecf0f1;
+      border: 2px solid #2c3e50;
+      border-radius: 50%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 50px;
+      font-weight: bold;
+      color: #2c3e50;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    .node:hover {
+      background: #d0e6f7;
+      transform: scale(1.1);
+    }
+
+  .node.active {
+    background: #dcdcdc;       /* 更淺的灰 */
+    color: #7f8c8d;
+    border-color: #bfbfbf;
+    transform: scale(1);
+    box-shadow: none;
+    opacity: 0.6;
+  }
+
+
+    canvas {
+      position: absolute;
+      left: 0;
+      top: 0;
+      pointer-events: none;
+    }
+
+    #message {
+      font-size: 20px;
+      font-weight: bold;
+      color: #34495e;
+      text-align: center;
+      animation: fadeIn 0.4s ease;
+      margin-top: 10px;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(-10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    #hintBtn {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      z-index: 100;
+      padding: 14px 20px;
+      font-size: 18px;
+      font-family: 'Noto Sans TC', sans-serif;
+      background-color: #e67e22;
+      color: white;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+      transition: background-color 0.3s ease, transform 0.2s ease;
+    }
+
+    #hintBtn:hover:enabled {
+      background-color: #d35400;
+      transform: scale(1.05);
+    }
+
+    #hintBtn:disabled {
+      background-color: #bdc3c7;
+      cursor: not-allowed;
+    }
+
+   @keyframes flash {
+    0%, 100% {
+      box-shadow: 0 0 10px 5px rgba(255, 255, 0, 0.6); /* 黃色發光 */
+      background-color: #fdfd96; /* 淺黃色背景 */
+      border-color: #f1c40f;
+      transform: scale(1.15);
+    }
+    50% {
+      box-shadow: 0 0 20px 10px rgba(255, 255, 0, 0.9);
+      background-color: #fff700; /* 更亮的黃色 */
+      border-color: #f39c12;
+      transform: scale(1.25);
+    }
+  }
+
+  .hint-flash {
+    animation: flash 0.8s ease-in-out 3;
+    z-index: 10;
+  }
+
+  </style>
+</head>
+<body>
+  <header>
+    <h1>數字連線</h1>
+  </header>
+   
+  <div id="message" style="font-size: 50px;"></div>
+
+  <div id="container">
+    <canvas id="lineCanvas"></canvas>
+  </div>
+
+  <!-- 提示按鈕 -->
+  <button id="hintBtn" disabled>提示</button>
+
+  <script>
+    const container = document.getElementById('container');
+    const message = document.getElementById('message');
+    const canvas = document.getElementById('lineCanvas');
+    const ctx = canvas.getContext('2d');
+    const hintBtn = document.getElementById('hintBtn');
+
+    let nodes = [];
+    let currentIndex = 0;
+    let startTime;
+    let hintInterval;
+    let wrongClicks = 0;
+    let hintCount = 0;
+
+    function resizeCanvas(){
+      canvas.width = container.clientWidth;
+      canvas.height = container.clientHeight;
+    }
+
+    resizeCanvas();
+    window.addEventListener('resize', resizeCanvas);
+
+    function clearCanvas(){
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+    }
+
+    function drawLines(){
+      clearCanvas();
+      if(currentIndex < 2) return;
+
+      ctx.strokeStyle = '#27ae60';
+      ctx.lineWidth = 3;
+      ctx.beginPath();
+      for(let i = 0; i < currentIndex; i++) {
+        let node = nodes[i];
+        let x = node.x + node.size / 2;
+        let y = node.y + node.size / 2;
+        if(i === 0) {
+          ctx.moveTo(x, y);
+        } else {
+          ctx.lineTo(x, y);
+        }
+      }
+      ctx.stroke();
+    }
+
+    function randomPosition(nodeSize, width, height){
+      let x = Math.random() * (width - nodeSize);
+      let y = Math.random() * (height - nodeSize);
+      return {x, y};
+    }
+
+    function isFarEnough(x, y, minDistance){
+      return nodes.every(n => {
+        let dx = n.x - x;
+        let dy = n.y - y;
+        return Math.sqrt(dx * dx + dy * dy) >= minDistance;
+      });
+    }
+
+    function initGame(){
+      const nodeCount = 5;
+      const nodeSize = 80;
+      const minDistance = nodeSize + 30;
+      currentIndex = 0;
+      nodes = [];
+      wrongClicks = 0;
+      hintCount = 0;
+      clearCanvas();
+      message.textContent = "請依序點擊數字 1 到 5";
+      startTime = new Date();
+
+      if (hintInterval) {
+        clearInterval(hintInterval);
+      }
+
+      // 提示按鈕倒數 20 秒
+          hintBtn.disabled = false;
+          hintBtn.textContent = '提示';
+          showHint();
+     
+
+      container.querySelectorAll('.node').forEach(n => n.remove());
+
+      for(let i = 1; i <= nodeCount; i++) {
+        let pos;
+        let tries = 0;
+        do {
+          pos = randomPosition(nodeSize, container.clientWidth, container.clientHeight);
+          tries++;
+          if(tries > 1000) break;
+        } while(!isFarEnough(pos.x, pos.y, minDistance));
+
+        let nodeEl = document.createElement('div');
+        nodeEl.className = 'node';
+        nodeEl.textContent = i;
+        nodeEl.style.left = pos.x + 'px';
+        nodeEl.style.top = pos.y + 'px';
+
+        container.appendChild(nodeEl);
+
+        nodes.push({
+          value: i,
+          x: pos.x,
+          y: pos.y,
+          size: nodeSize,
+          element: nodeEl
+        });
+
+        nodeEl.addEventListener('click', () => {
+          if(i === currentIndex + 1){
+            nodeEl.classList.add('active');
+
+            currentIndex++;
+            drawLines();
+
+            if(currentIndex === nodeCount){
+              const endTime = new Date();
+              const duration = ((endTime - startTime) / 1000).toFixed(2);
+              if (hintInterval) {
+                clearInterval(hintInterval);
+              }
+
+              // ✅ 儲存至 localStorage
+              localStorage.setItem("duration", duration);
+              localStorage.setItem("wrongClicks", wrongClicks);
+              localStorage.setItem("hintCount", hintCount);
+
+              window.location.href = "../numberend.html";
+            }
+          } else {
+            wrongClicks++;
+            message.textContent = '請依照順序點擊數字！';
+            setTimeout(() => {
+              message.textContent = `請依序點擊數字 ${currentIndex + 1}`;
+            }, 2000);
+          }
+        });
+      }
+    }
+
+    function showHint(){
+      if (hintBtn.disabled) return;
+      if (currentIndex >= nodes.length) return;
+
+      const nextNode = nodes[currentIndex];
+      nextNode.element.classList.add('hint-flash');
+      hintCount++;
+
+      setTimeout(() => {
+        nextNode.element.classList.remove('hint-flash');
+      }, 1500);
+    }
+
+    hintBtn.addEventListener('click', showHint);
+
+    initGame();
+  </script>
+</body>
+</html>  
+

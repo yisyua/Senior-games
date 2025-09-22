@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <title>遊戲介面</title>
+    <link rel="stylesheet" href="static/style6.css"> <!-- 引入CSS -->
+    <style>
+        .matched {
+            background-color: rgb(202, 236, 207);
+            font-weight: bold;
+            color: black;
+            cursor: default;
+        }
+
+        /* ✅ 修改：提示鍵固定右上角 */
+        #hintButton {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            font-size: 18px;
+            padding: 10px 20px;
+            background-color: orange;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        #hintButton:disabled {
+            background-color: lightgray;
+            cursor: not-allowed;
+        }
+
+        #timer1 {
+            font-size: 20px;
+            text-align: center;
+            margin-top: 10px;
+            display: block;
+        }
+    </style>
+</head>
+<body onload="previewAllCards()">
+    <div id="timer-container" style="display:none;">
+        時間: <span id="timer" style="display:none;">0</span> 秒<br>
+        翻開提醒次數: <span id="count1">0</span> 次
+    </div>
+    <span id="timer1" style="font-size: 64px; font-weight: bold;text-align: center;display:none;"></span>
+    <form>
+        <button class="card-button" id="option1" type="button">?</button>
+        <button class="card-button" id="option2" type="button">?</button>
+        <button class="card-button" id="option3" type="button">?</button>
+        <button class="card-button" id="option4" type="button">?</button>
+        <button class="card-button" id="option5" type="button">?</button>
+        <button class="card-button" id="option6" type="button">?</button>
+        <button class="card-button" id="option7" type="button">?</button>
+        <button class="card-button" id="option8" type="button">?</button>
+    </form>
+
+    <!-- 新增提示按鈕 -->
+    <button id="hintButton" disabled>提示鍵</button>
+
+<script>
+   const emojis = [
+      '../changecard_pi1.PNG',
+      '../changecard_pi2.PNG',
+      '../changecard_pi3.PNG',
+      '../changecard_pi1.PNG',
+      '../changecard_pi2.PNG',
+      '../changecard_pi3.PNG',
+      '../changecard_pi4.PNG',
+      '../changecard_pi4.PNG',
+    ];
+    var buttons = [];
+    for(let i=1; i<=8; i++) {
+        buttons.push(document.getElementById("option"+i));
+    }
+
+   let shuffled = [];
+    let card = [], card2 = [], matchedCount = 0;
+    let count = 0, countdown = 0;
+    let interval;
+    let isRevealing = false;
+    const hintButton = document.getElementById("hintButton");
+    function shuffle(array) {
+      for (let i = array.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]];
+      }
+      return array;
+    }
+
+    function showCard(button, content) {
+      if (content === "?") {
+        button.innerHTML = "?";
+      } else {
+        button.innerHTML = `<img src="${content}" alt="card">`;
+      }
+    }
+
+  function startHintCountdown() {
+      hintButton.disabled = false;
+      const hintTimer = setInterval(() => {
+          clearInterval(hintTimer);
+      }, 5000);
+    }
+
+    function previewAllCards() {
+      shuffled = shuffle([...emojis]);
+      buttons.forEach((btn, i) => {
+        showCard(btn, shuffled[i]);
+        btn.disabled = true;
+      });
+
+      let previewCountdown = 5;
+      document.getElementById("timer").innerText = "記憶倒數時間:" + previewCountdown;
+
+      const previewInterval = setInterval(() => {
+        previewCountdown--;
+        document.getElementById("timer").innerText = "記憶倒數時間:" + previewCountdown;
+        if (previewCountdown === 0) {
+          clearInterval(previewInterval);
+          document.getElementById("timer").innerText = "遊戲開始!!!";
+
+          buttons.forEach(btn => {
+            showCard(btn, "?");
+            btn.disabled = false;
+          });
+
+          interval = setInterval(() => {
+            countdown++;
+            document.getElementById("timer1").innerText = countdown;
+            localStorage.setItem("reminderTime", countdown);
+          }, 1000);
+
+          startHintCountdown();
+        }
+      }, 1000);
+    }
+
+    function startGame(button, index) {
+      if (isRevealing) return;
+      if (card.length < 2 && !card2.includes(button)) {
+        showCard(button, shuffled[index]);
+        card.push(shuffled[index]);
+        card2.push(button);
+
+        if (card.length === 2) {
+          setTimeout(() => {
+            if (card[0] === card[1]) {
+              card2.forEach(btn => {
+                btn.disabled = true;
+                btn.classList.add("matched");
+              });
+              matchedCount += 2;
+              if (matchedCount === emojis.length) {
+                clearInterval(interval);
+                localStorage.setItem("reminderCount", count);
+                location.href = "6changecard.html";
+              }
+            } else {
+              card2.forEach(btn => showCard(btn, "?"));
+            }
+            card = [];
+            card2 = [];
+          }, 500);
+        }
+      }
+    }
+
+    hintButton.addEventListener("click", () => {
+      if (isRevealing) return;
+      isRevealing = true;
+
+      count++;
+      document.getElementById("count1").innerText = count;
+      localStorage.setItem("reminderCount", count);
+
+      buttons.forEach((btn, i) => {
+        if (!btn.classList.contains("matched")) {
+          showCard(btn, shuffled[i]);
+          btn.disabled = true;
+        }
+      });
+
+      hintButton.disabled = true;
+
+      setTimeout(() => {
+        buttons.forEach((btn) => {
+          if (!btn.classList.contains("matched")) {
+            showCard(btn, "?");
+            btn.disabled = false;
+            btn.style.backgroundColor = "";
+            btn.style.color = "";
+          }
+        });
+        isRevealing = false;
+        startHintCountdown();
+      }, 5000);
+    });
+
+    buttons.forEach((btn, i) => {
+      btn.addEventListener("click", () => startGame(btn, i));
+    });
+
+</script>
+</body>
+</html>

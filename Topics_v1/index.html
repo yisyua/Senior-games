@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>登入</title>
+  <style>
+    body {
+      background-color: #ffffff;
+      font-family: "標楷體", "Microsoft JhengHei", "Noto Sans TC", sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+    }
+
+    .login-box {
+      background-color: #ffffff;
+      border-radius: 25px;
+      padding: 40px 30px;
+      width: 90%;
+      max-width: 420px;
+      text-align: center;
+    }
+
+    .login-box img {
+      width: 100px;
+      margin-bottom: 20px;
+    }
+
+    .login-box h1 {
+      font-size: 50px;
+      color: #000000;
+      margin-bottom: 25px;
+      line-height: 1.5;
+    }
+
+    label {
+      font-size: 1.3rem;
+      display: block;
+      text-align: left;
+      margin: 0 auto 8px auto;
+      width: 80%;
+      max-width: 300px;
+      color: #333;
+    }
+
+    input {
+      width: 80%;
+      max-width: 300px;
+      display: block;
+      margin: 0 auto 25px auto;
+      padding: 14px;
+      font-size: 30px;
+      border: 2px solid #ddd;
+      border-radius: 10px;
+      background-color: #fff;
+      cursor: pointer;
+    }
+
+    select {
+      width: 325px;
+      max-width: 100%;
+      display: block;
+      margin: 0 auto 25px auto;
+      padding: 14px;
+      font-size: 30px;
+      border: 2px solid #ddd;
+      border-radius: 10px;
+      background-color: #fff;
+      cursor: pointer;
+      font-family: "標楷體", "Microsoft JhengHei", "Noto Sans TC", sans-serif;
+    }
+
+    select:focus,
+    input:focus {
+      border-color: #f4b6b6;
+      outline: none;
+    }
+
+    button {
+      width: 80%;
+      max-width: 300px;
+      padding: 18px;
+      background-color: #8d8c8c;
+      border: none;
+      border-radius: 15px;
+      font-size: 1.5rem;
+      font-weight: bold;
+      color: #000000;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+      font-family: "標楷體", "Microsoft JhengHei", "Noto Sans TC", sans-serif;
+    }
+
+    button:hover {
+      background-color: #696969;
+    }
+  </style>
+</head>
+<body>
+  <div class="login-box">
+    <h1>登入系統</h1>
+
+    <form onsubmit="handleLogin(event)">
+      <label for="nickname" style="font-size:30px">帳號</label>
+      <input type="text" id="nickname" name="請輸入帳號" required>
+
+      <label for="hobby" style="font-size:30px">嗜好</label>
+      <select id="hobby" name="hobby" onchange="showInput()">
+        <option value="" disabled selected>請選擇嗜好</option>
+        <option value="散步">散步</option>
+        <option value="下棋">下棋</option>
+        <option value="喝下午茶">喝下午茶</option>
+        <option value="看影片">看影片</option>
+        <option value="唱歌">唱歌</option>
+        <option value="其他">其他</option>
+      </select>
+
+      <input type="text" id="other" name="other" placeholder="請輸入其他內容" style="display: none;font-family:標楷體;">
+
+      <button type="submit">送出</button>
+    </form>
+  </div>
+
+  <script>
+    function showInput() {
+      const hobby = document.getElementById('hobby').value;
+      const otherInput = document.getElementById('other');
+      otherInput.style.display = hobby === "其他" ? 'block' : 'none';
+    }
+
+    function handleLogin(event) {
+      event.preventDefault();
+      const nickname = document.getElementById('nickname').value.trim();
+      const hobby = document.getElementById('hobby').value;
+      const other = document.getElementById('other').value.trim();
+
+      localStorage.setItem("nickname", nickname);
+      localStorage.setItem("hobby", hobby);
+      localStorage.setItem("other", other || "");
+
+      window.location.href = "changecard/changecardhead.html"; // 換成你的關卡選擇頁
+    }
+  </script>
+</body>
+</html>

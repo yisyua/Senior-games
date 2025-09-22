@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>遊戲規則說明</title>
+  <style>
+    body {
+      font-family: "標楷體", "Microsoft JhengHei", "Noto Sans TC", sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #fdfdfd;
+    }
+
+    h1, h2 {
+      text-align: center;
+    }
+
+    .icon-wrapper {
+      position: relative;
+      width: 320px;
+      height: 250px;
+      margin: 40px auto;
+      background-color: #ffffff;
+      border-radius: 12px;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+      padding: 10px;
+    }
+
+    .node {
+      position: absolute;
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      color: #000;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 22px;
+      font-weight: bold;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+      z-index: 2;
+    }
+
+    /* 各節點背景色彩 */
+    .n1 { top: 10px; left: 130px; background-color: #d6ecff; border: 3px solid #a1c9f7; }
+    .n2 { top: 90px; left: 130px; background-color: #f5f0e6; border: 3px solid #ccc0a8; }
+    .n3 { top: 180px; left: 50px; background-color: #fffecf; border: 3px solid #d3d078; }
+    .n4 { top: 180px; left: 130px; background-color: #eeeeee; border: 3px solid #bbbbbb; }
+    .n5 { top: 180px; left: 210px; background-color: #ffe3e3; border: 3px solid #f5b2b2; }
+
+    .line {
+      position: absolute;
+      height: 4px;
+      background-color: #555;
+      z-index: 1;
+      transform-origin: left center;
+      border-radius: 2px;
+    }
+
+    .l1 { top: 70px; left: 158px; width: 4px; height: 20px; background-color: #555; } /* 垂直線 1→2 */
+    .l2 {
+      top: 125px;
+      left: 158px;
+      width: 88px;
+      height: 4px;
+      transform: rotate(135deg);
+    }
+    .l3 { top: 210px; left: 80px; width: 60px; } /* 水平線 3→4 */
+    .l4 { top: 210px; left: 160px; width: 60px; } /* 水平線 4→5 */
+
+    /* 按鈕區塊 */
+    .arrow-button,
+.arrow-button1,
+.arrow-button2 {
+  position: fixed;
+  font-size: 36px;
+  background-color: #ffffff;
+  color: rgb(0, 0, 0);
+  padding: 10px 20px;
+  border-radius: 12px;
+  cursor: pointer;
+  user-select: none;
+  transition: background-color 0.3s ease;
+  font-family: "標楷體", "Microsoft JhengHei", "Noto Sans TC", sans-serif;
+  z-index: 1000;
+}
+
+/* 各個箭頭位置調整 */
+.arrow-button {
+  right: 30px;
+  bottom: 250px;
+}
+
+.arrow-button1 {
+  left: 30px;
+  bottom: 250px;
+}
+
+.arrow-button2 {
+  left: 30px;
+  top: 20px;
+  padding: 8px 18px;
+}
+
+/* 懸停效果 */
+.arrow-button:hover,
+.arrow-button1:hover,
+.arrow-button2:hover {
+  background-color: #ffffff;
+}
+
+/* 返回按鈕放左上角 */
+.back-button {
+  position: fixed;
+  top: 20px;
+  left: 20px;
+  font-size: 50px;
+  background-color: #ffffff;
+  color: rgb(0, 0, 0);
+  border: none;
+  border-radius: 10px;
+  padding: 12px 30px;
+  cursor: pointer;
+  font-family: "標楷體", "Microsoft JhengHei", "Noto Sans TC", sans-serif;
+  z-index: 1000;
+  transition: background-color 0.3s ease;
+}
+
+.back-button:hover {
+  background-color: #ffffff;
+}
+
+
+/* 響應式設計：手機適配 */
+@media (max-width: 600px) {
+  body {
+    font-size: 22px;
+    padding: 10px;
+  }
+
+  h1, h2 {
+    font-size: 32px;
+  }
+
+  .rule-list {
+    font-size: 22px;
+  }
+
+  .arrow-button,
+  .arrow-button1 {
+    font-size: 28px;
+    padding: 8px 14px;
+    bottom: 20px;
+  }
+  
+  /* 返回鍵放左上方，大小調整 */
+  .arrow-button2 {
+    top: 10px;
+    left: 10px;
+    font-size: 28px;
+    padding: 8px 14px;
+  }
+}
+
+</style>
+</head>
+<body>
+  <h1 style="font-size: 50px;">遊戲規則</h1>
+
+  <div class="icon-wrapper">
+    <!-- 線條 -->
+    <div class="line l1"></div>
+    <div class="line l2"></div>
+    
+
+    <!-- 節點 -->
+    <div class="node n1">1</div>
+    <div class="node n2">3</div>
+    <div class="node n3">2</div>
+    <div class="node n4">4</div>
+    <div class="node n5">5</div>
+  </div>
+
+  <h2 style="color: red;font-size: 50px;">連線錯誤<br>2下一個要連到3</h2>
+
+  <div class="arrow-wrapper">
+    <span class="arrow-button" onclick="location.href='illustrate_pi2.html'">❯</span>
+    <span class="arrow-button1" onclick="location.href='illustrate.html'">❮</span>
+    <span class="back-button" onclick="location.href='../numberstart.html'">X</span>
+  </div>
+
+  <script>
+    const username = localStorage.getItem("nickname") || "訪客";
+    // 可用 document.querySelector() 動態顯示使用者名稱（若有）
+    function logout() {
+      localStorage.clear();
+      location.href = "../index.html";
+    }
+
+    function exportGameData() {
+      const records = JSON.parse(localStorage.getItem("gameResults") || "[]");
+      if (records.length === 0) {
+        alert("沒有遊戲紀錄可匯出！");
+        return;
+      }
+
+      const ws = XLSX.utils.json_to_sheet(records);
+      const wb = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(wb, ws, "遊戲紀錄");
+      XLSX.writeFile(wb, "game_results.xlsx");
+
+      localStorage.removeItem("gameResults");
+    }
+  </script>
+</body>
+</html>

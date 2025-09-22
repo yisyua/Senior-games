@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>遊戲結束</title>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    html, body {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      overflow: hidden;
+      font-family: "標楷體", "Microsoft JhengHei", "Noto Sans TC", sans-serif;
+      background-color: #f9fbfc;
+      color: #000;
+    }
+
+    body {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 1rem;
+      min-height: 100vh;
+    }
+
+    .container {
+      background-color: #ffffff;
+      padding: 2.5rem 2rem;
+      border-radius: 20px;
+      width: 100%;
+      max-width: 600px;
+      text-align: center;
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
+      overflow: hidden;
+    }
+
+    h1 {
+      font-size: 2.8rem;
+      margin-bottom: 2rem;
+      color: #667788;
+    }
+
+    .result-box, .result-box1 {
+      font-size: 1.8rem;
+      margin-bottom: 2rem;
+      padding: 1.8rem;
+      border-radius: 15px;
+      text-align: left;
+      word-break: break-word;
+    }
+
+    .result-box {
+      background-color: #f0f0f0;
+      color: #555;
+    }
+
+    .result-box1 {
+      background-color: #e6e6e6;
+      color: #444;
+      font-weight: bold;
+    }
+
+    .buttons {
+      display: flex;
+      flex-direction: row;
+      justify-content: center;
+      gap: 1rem;
+      flex-wrap: wrap;
+      margin-top: 1.5rem;
+    }
+
+    .buttons button {
+      flex: 1 1 140px;
+      max-width: 180px;
+      font-size: 1.6rem;
+      padding: 1rem 1.2rem;
+      border: none;
+      border-radius: 12px;
+      cursor: pointer;
+      font-weight: bold;
+      color: #333;
+      background-color: #ddd;
+      font-family: "標楷體", "Microsoft JhengHei", "Noto Sans TC", sans-serif;
+      transition: background-color 0.2s ease;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      box-shadow: none;
+      user-select: none;
+    }
+
+    .buttons button:hover {
+      background-color: #ccc;
+    }
+
+    .user-info {
+      position: fixed;
+      top: 1rem;
+      right: 1rem;
+      font-size: 1.5rem;
+      background-color: #ffffffcc;
+      padding: 1rem;
+      border-radius: 12px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+      display: flex;
+      align-items: center;
+      max-width: 300px;
+      overflow: hidden;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+    }
+
+    .user-info button {
+      margin-left: 1rem;
+      font-size: 1.2rem;
+      padding: 0.6rem 1.2rem;
+      border: none;
+      background-color: #e0e0e0;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background-color 0.2s ease;
+      user-select: none;
+    }
+
+    .user-info button:hover {
+      background-color: #ccc;
+    }
+
+    @media (max-width: 600px) {
+      h1 {
+        font-size: 2.2rem;
+      }
+      .result-box, .result-box1 {
+        font-size: 1.4rem;
+        padding: 1.2rem;
+      }
+      .buttons button {
+        font-size: 1.4rem;
+        flex: 1 1 120px;
+        max-width: 150px;
+      }
+      .user-info {
+        font-size: 1.2rem;
+        max-width: 180px;
+        padding: 0.8rem;
+      }
+      .user-info button {
+        font-size: 1rem;
+        padding: 0.4rem 0.8rem;
+        margin-left: 0.5rem;
+      }
+    }
+  </style>
+  <script src="https://cdn.sheetjs.com/xlsx-latest/package/dist/xlsx.full.min.js"></script>
+</head>
+<body onload="end()">
+  <div class="user-info">
+    <span id="username">您好，訪客</span>
+    <button onclick="logout()">登出</button>
+  </div>
+
+  <div class="container">
+    <h1>遊戲結果</h1>
+
+    <div class="result-box1">
+      <div>總點錯次數: <span id="count2"></span> 次</div>
+      <div>平均用時: <span id="usedTime"></span> 秒</div>
+    </div>
+
+    <div class="buttons">
+      <button onclick="location.href='game/33.html';clearGame()" id="test" style="display: none;">再練習</button>
+      <button onclick="location.href='game/34.html';clearGame()" id="test2" style="display: none;">進入測試</button>
+      <button onclick="location.href='../number/numberstart.html';" id="play" style="display: none;">下一關</button>
+    </div>
+  </div>
+
+  <script>
+    const username = localStorage.getItem("nickname") || "訪客";
+    const hobby = localStorage.getItem("other") || localStorage.getItem("hobby") || "未知";
+    let level = localStorage.getItem("test");
+
+    const timeLeft1 = localStorage.getItem("reminderTime");
+    const timeLeft2 = localStorage.getItem("reminderTime2");
+    const timeLeft3 = localStorage.getItem("reminderTime3");
+    const count = parseInt(localStorage.getItem("count2")) || 0;
+    const count1 = parseInt(localStorage.getItem("count3")) || 0;
+    const count2 = parseInt(localStorage.getItem("count4")) || 0;
+
+    document.getElementById("username").textContent = `您好，${username}`;
+
+    function calcAverage(t1, t2, t3) {
+      const v1 = parseFloat(t1) || 0;
+      const v2 = parseFloat(t2) || 0;
+      const v3 = parseFloat(t3) || 0;
+      const values = [v1, v2, v3].filter(v => v > 0);
+      if (values.length === 0) return "-";
+      const sum = values.reduce((a, b) => a + b, 0);
+      return (sum / values.length).toFixed(2);
+    }
+      document.getElementById("test2").addEventListener("click", function () {
+    level = "測驗";
+    localStorage.setItem("test", "測驗");
+    end(); // 重新渲染畫面
+  });
+
+    function end() {
+      if (level === "測驗") {
+          document.getElementById("username").textContent = `您好，${username}`;
+        document.getElementById("count2").textContent = count + count1 + count2;
+        document.getElementById("usedTime").textContent = calcAverage(timeLeft1, timeLeft2, timeLeft3);
+
+        document.getElementById("play").style.display = "block";
+        document.getElementById("test").style.display = "none";
+        document.getElementById("test2").style.display = "none";
+
+        saveGameResultToNewTable();
+      } else if(level === "練習") {
+          document.getElementById("username").textContent = `您好，${username}`;
+        document.getElementById("count2").textContent = count + count1 + count2;
+        document.getElementById("usedTime").textContent = calcAverage(timeLeft1, timeLeft2, timeLeft3);
+
+        document.getElementById("test").style.display = "block";
+        document.getElementById("test2").style.display = "block";
+        document.getElementById("play").style.display = "none";
+      } else {
+        // 預設狀態 (沒設定 level)
+        document.getElementById("count2").textContent = count + count1 + count2;
+        document.getElementById("usedTime").textContent = calcAverage(timeLeft1, timeLeft2, timeLeft3);
+        document.getElementById("test").style.display = "block";
+        document.getElementById("test2").style.display = "block";
+        document.getElementById("play").style.display = "none";
+      }
+    }
+
+    function saveGameResultToNewTable() {
+      const now = new Date();
+      const timestamp = now.toISOString().replace(/[:.]/g, '-');
+      const key = `numberMatchResult_${timestamp}`;
+      const averageTime = calcAverage(timeLeft1, timeLeft2, timeLeft3);
+
+      const newRecord = {
+        遊戲玩家名稱: username,
+        嗜好: hobby,
+        遊戲名稱: "數字配對",
+        第一關遊戲22方格與34方格總秒數: timeLeft1 || null,
+        第一關點錯次數: count,
+        第二關遊戲35方格總秒數: timeLeft2 || null,
+        第二關點錯次數: count1,
+        第三關遊戲44方格總總秒數: timeLeft3 || null,
+        第三關點錯次數: count2,
+        總平均時間: averageTime,
+        時間: now.toLocaleString()
+      };
+      
+      localStorage.setItem(key, JSON.stringify([newRecord]));
+
+      let tableList = JSON.parse(localStorage.getItem("numberMatchTables") || "[]");
+
+// 假設這裡是你從 localStorage 拿到的一些 key 集合
+const allKeys = Object.keys(localStorage);
+
+for (const key of allKeys) {
+  // 排除名稱中包含「練習」的 key
+  if (key.includes("練習")) continue;
+
+  if (!tableList.includes(key)) {
+    tableList.push(key);
+  }
+}
+
+localStorage.setItem("numberMatchTables", JSON.stringify(tableList));
+
+    }
+
+    function clearGame() {
+      const keys = ["reminderTime", "reminderTime2", "reminderTime3", "reminderCount", "count3", "count2","count4"];
+      keys.forEach(k => localStorage.removeItem(k));
+    }
+
+    function logout() {
+      localStorage.clear();
+      location.href = "../index.html";
+    }
+
+    // 立即呼叫 end() 確保介面初始化
+    window.onload = end;
+  </script>
+</body>
+</html>

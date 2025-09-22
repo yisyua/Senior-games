@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <title>圖片說明2</title>
+    <link rel="stylesheet" href="static/style7.css"> <!-- 引入CSS -->
+</head>
+<style>
+.user-info {
+  position: fixed;
+  top: 20px;
+  right: 30px;
+  font-size: 28px; /* 與 style8 相同大小 */
+  color: #333;
+  display: flex;
+  gap: 15px;
+  align-items: center;
+  font-family: "華康兒風體W3", "Microsoft JhengHei", sans-serif;
+  z-index: 1000;
+}
+
+.user-info button {
+  padding: 12px 20px;
+  background-color: #CECEFF;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  font-weight: bold;
+  font-size: 24px; /* 與 style8 相同字體大小 */
+  transition: background-color 0.3s ease;
+  font-family: "華康兒風體W3", "Microsoft JhengHei", sans-serif;
+}
+
+.user-info button:hover {
+  background-color: #b2b2ff;
+}
+
+.arrow-left {
+  display: inline-block;
+  width: 20px;
+  height: 20px;
+  border-top: 4px solid black;
+  border-left: 4px solid black;
+  transform: rotate(-45deg);
+  margin: 20px;
+  cursor: pointer;
+}
+.arrow-right {
+  display: inline-block;
+  width: 20px;
+  height: 20px;
+  border-top: 4px solid black;
+  border-right: 4px solid black;
+  transform: rotate(45deg);  /* 旋轉方向改為正 45 度 */
+  margin: 20px;
+  cursor: pointer;
+}
+button {
+  background: none;
+  border: none;
+  padding: 0;
+  margin: 10px;
+  cursor: pointer;
+}
+
+button img {
+  width: 100px;     /* 控制圖片大小 */
+  height: 100px;
+  object-fit: contain;
+}
+</style>
+<body>
+    <h2>記憶翻牌</h2>
+    <form>
+        <button id="option1">
+          <img src="../changecard_pi3.PNG" alt="option1" width="100">
+        </button>
+        <input type="button" id="option2" value="?">
+        <input type="button" id="option3" value="?">
+        <input type="button" id="option4" value="?">
+        <button id="option5">
+          <img src="../changecard_pi3.PNG" alt="option5" width="100">
+        </button>
+        <input type="button" id="option6" value="?">
+    </form>
+    <h2 style="color: green;">配對成功</h2>
+    <div class="arrow-button1">
+      <a class="arrow-left"  onclick="location.href='changecardpi1.html'"></a>
+    </div>
+    <div class="arrow-button">
+      <a class="arrow-right"  onclick="location.href='../changecard.html'"></a>
+    </div>
+    <span class="arrow-button2" onclick="location.href='../changecardhead.html'">X</span>
+      <script>
+      const username = localStorage.getItem("nickname") || "訪客";
+      document.getElementById("username").textContent = `您好，${username}`;
+
+      function logout() {
+        localStorage.clear(); // 一鍵清除所有 localStorage 資料
+       location.href = "../../index.html"; // 替換成你的登入頁路徑
+      }
+        function exportGameData() {
+    const records = JSON.parse(localStorage.getItem("gameResults") || "[]");
+    if (records.length === 0) {
+      alert("沒有遊戲紀錄可匯出！");
+      return;
+    }
+
+    const ws = XLSX.utils.json_to_sheet(records);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, "遊戲紀錄");
+    XLSX.writeFile(wb, "game_results.xlsx");
+
+    // 清空遊戲紀錄（如果你要保留就註解這行）
+    localStorage.removeItem("gameResults");
+  }
+    </script> 
+</body>
+</html>
