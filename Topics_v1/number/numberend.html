@@ -248,19 +248,20 @@
   </div>
 
   <script>
-    const username = localStorage.getItem('nickname') || '玩家';
-    const hobby = localStorage.getItem('hobby') || localStorage.getItem('habit') || '未知';
-    let level = localStorage.getItem("test");
+    const username = '演示玩家';
+    const hobby = '閱讀';
+    let level = "測驗"; // 演示設為測驗模式
 
-    const timeLeft1 = parseFloat(localStorage.getItem('duration')) || null;
-    const timeLeft2 = parseFloat(localStorage.getItem('duration1')) || null;
-    const timeLeft3 = parseFloat(localStorage.getItem('duration2')) || null;
-    const timeLeft4 = parseFloat(localStorage.getItem('duration3')) || null;
-    const count1 = parseInt(localStorage.getItem("hintCount") || "0");
-    const count2 = parseInt(localStorage.getItem("hintCount1") || "0");
-    const count3 = parseInt(localStorage.getItem("hintCount2") || "0");
-    const count4 = parseInt(localStorage.getItem("hintCount3") || "0");
-    const count = parseInt(localStorage.getItem("wrongClicks") || "0");
+    // 演示數據
+    const timeLeft1 = 12.5;
+    const timeLeft2 = 18.3;
+    const timeLeft3 = 25.7;
+    const timeLeft4 = 32.1;
+    const count1 = 2;
+    const count2 = 3;
+    const count3 = 1;
+    const count4 = 4;
+    const count = 5;
 
     document.getElementById('usernameDisplay').textContent = `您好，${username}`;
 
@@ -300,41 +301,65 @@
     document.getElementById('usedTime').textContent = avg !== null ? avg.toFixed(2) : "—";
 
     function saveGameResultToNewTable() {
-      const now = new Date();
-      const timestamp = now.toISOString().replace(/[:.]/g, '-');
-      const key = `numberGameResult_${timestamp}`;
-
-      const newRecord = {
-        遊戲玩家名稱: username,
-        嗜好: hobby,
-        遊戲名稱: "數字連線",
-        第一關遊戲1到5總秒數: timeLeft1,
-        第一關遊戲1到5提醒次數: count1,
-        第二關遊戲1到10總秒數: timeLeft2,
-        第二關遊戲1到10提醒次數: count2,
-        第三關遊戲1到15總秒數: timeLeft3,
-        第三關遊戲1到15提醒次數: count3,
-        第四關遊戲1到20總秒數: timeLeft4,
-        第四關遊戲1到15提醒次數: count4,
-        總平均時間: avg !== null ? avg.toFixed(2) : null,
-        錯誤提醒次數: count,
-        時間: now.toLocaleString()
+      // 創建一些演示數據
+      const demoData = {
+        "翻牌": [
+          {
+            遊戲玩家名稱: username,
+            嗜好: hobby,
+            遊戲名稱: "翻牌遊戲",
+            完成時間: "45.2秒",
+            錯誤次數: 3,
+            時間: new Date().toLocaleString()
+          }
+        ],
+        "數字配對": [
+          {
+            遊戲玩家名稱: username,
+            嗜好: hobby,
+            遊戲名稱: "數字配對",
+            完成時間: "38.7秒",
+            配對成功次數: 15,
+            時間: new Date().toLocaleString()
+          }
+        ],
+        "天燈": [
+          {
+            遊戲玩家名稱: username,
+            嗜好: hobby,
+            遊戲名稱: "天燈遊戲",
+            反應時間: "1.2秒",
+            準確度: "95%",
+            時間: new Date().toLocaleString()
+          }
+        ],
+        "數字連線": [
+          {
+            遊戲玩家名稱: username,
+            嗜好: hobby,
+            遊戲名稱: "數字連線",
+            第一關遊戲1到5總秒數: timeLeft1,
+            第一關遊戲1到5提醒次數: count1,
+            第二關遊戲1到10總秒數: timeLeft2,
+            第二關遊戲1到10提醒次數: count2,
+            第三關遊戲1到15總秒數: timeLeft3,
+            第三關遊戲1到15提醒次數: count3,
+            第四關遊戲1到20總秒數: timeLeft4,
+            第四關遊戲1到15提醒次數: count4,
+            總平均時間: avg !== null ? avg.toFixed(2) : null,
+            錯誤提醒次數: count,
+            時間: new Date().toLocaleString()
+          }
+        ]
       };
 
-      localStorage.setItem(key, JSON.stringify([newRecord]));
-
-      let tableList = JSON.parse(localStorage.getItem("numberGameTables") || "[]");
-
-      // 避免重複加入
-      if (!tableList.includes(key)) {
-        tableList.push(key);
-        localStorage.setItem("numberGameTables", JSON.stringify(tableList));
-      }
+      // 將演示數據存儲到變數中供匯出使用
+      window.demoGameData = demoData;
     }
 
     function clearGame() {
-      const keys = ["duration", "duration1", "duration2", "duration3", "wrongClicks", "hintCount","hintCount1","hintCount2","hintCount3"];
-      keys.forEach(k => localStorage.removeItem(k));
+      // 清除遊戲數據的邏輯
+      console.log("清除遊戲數據");
     }
 
     function logout() {
