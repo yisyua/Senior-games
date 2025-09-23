@@ -29,5 +29,5 @@ HTML / CSS：頁面結構與版面設計
 JavaScript：遊戲邏輯與互動實作
 
 本遊戲已部署於 GitHub Pages，點擊下方連結即可直接遊玩：  
-[立即體驗數字連線遊戲](https://yisyua.github.io/Senior-games/Topics_v1/)
+[立即體驗遊戲](https://yisyua.github.io/Senior-games/Topics_v1/)
 
