@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>遊戲結果與匯出</title>
 
-  <!-- XLSX 用於讀取 Excel（保留你原本程式碼如果未來還要） -->
+  <!-- XLSX 用於讀取和寫入 Excel -->
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 
   <!-- 加入 html2pdf.js 用於匯出 PDF -->
@@ -107,12 +107,24 @@
 
     .buttons {
       display: flex;
-      flex-direction: row;
+      flex-direction: column;
       justify-content: center;
       gap: 1rem;
       width: 100%;
       max-width: 600px;
       flex-shrink: 0;
+    }
+
+    .game-buttons {
+      display: flex;
+      flex-direction: row;
+      gap: 1rem;
+    }
+
+    .export-buttons {
+      display: flex;
+      flex-direction: row;
+      gap: 1rem;
     }
 
     .buttons button {
@@ -124,7 +136,6 @@
       cursor: pointer;
       font-weight: bold;
       color: #333;
-      background-color: #ddd;
       font-family: "標楷體", "Microsoft JhengHei", "Noto Sans TC", sans-serif;
       transition: background-color 0.2s ease;
       white-space: nowrap;
@@ -133,8 +144,29 @@
       user-select: none;
     }
 
-    .buttons button:hover {
+    .game-buttons button {
+      background-color: #ddd;
+    }
+
+    .game-buttons button:hover {
       background-color: #ccc;
+    }
+
+    .export-buttons button {
+      background-color: #4CAF50;
+      color: white;
+    }
+
+    .export-buttons button:hover {
+      background-color: #45a049;
+    }
+
+    .export-buttons button.pdf-btn {
+      background-color: #2196F3;
+    }
+
+    .export-buttons button.pdf-btn:hover {
+      background-color: #1976D2;
     }
 
     @media (max-width: 600px) {
@@ -157,6 +189,9 @@
         font-size: 1rem;
         padding: 0.4rem 0.8rem;
         margin-left: 0.5rem;
+      }
+      .game-buttons, .export-buttons {
+        flex-direction: column;
       }
     }
 
@@ -195,9 +230,15 @@
   </div>
 
   <div class="buttons">
-    <button onclick="location.href='game/number_game1.html';clearGame()" id="test" style="display: none;">再練習</button>
-    <button onclick="location.href='game/number_game2.html';clearGame()" id="test2" style="display: none;">進入測試</button>
-    <button onclick="exportAllGameTables()" style="display: none;" id="play">匯出全部遊戲紀錄 (PDF)</button>
+    <div class="game-buttons">
+      <button onclick="location.href='game/number_game1.html';clearGame()" id="test" style="display: none;">再練習</button>
+      <button onclick="location.href='game/number_game2.html';clearGame()" id="test2" style="display: none;">進入測試</button>
+    </div>
+    
+    <div class="export-buttons" id="exportButtons" style="display: none;">
+      <button onclick="exportAllGameExcel()" class="excel-btn">匯出遊戲紀錄(Excel)</button>
+      <button onclick="exportAllGameTables()" class="pdf-btn">匯出遊戲紀錄(PDF)</button>
+    </div>
   </div>
 
   <!-- 隱藏區塊用來生成PDF內容 -->
@@ -207,47 +248,46 @@
   </div>
 
   <script>
-    const username = localStorage.getItem('nickname') || '玩家';
-    const hobby = localStorage.getItem('hobby') || localStorage.getItem('habit') || '未知';
-    let level = localStorage.getItem("test");
+    const username = '演示玩家';
+    const hobby = '閱讀';
+    let level = "測驗"; // 演示設為測驗模式
 
-    const timeLeft1 = parseFloat(localStorage.getItem('duration')) || null;
-    const timeLeft2 = parseFloat(localStorage.getItem('duration1')) || null;
-    const timeLeft3 = parseFloat(localStorage.getItem('duration2')) || null;
-    const timeLeft4 = parseFloat(localStorage.getItem('duration3')) || null;
-    const count1 = parseInt(localStorage.getItem("hintCount") || "0");
-    const count2 = parseInt(localStorage.getItem("hintCount1") || "0");
-    const count3 = parseInt(localStorage.getItem("hintCount2") || "0");
-    const count4 = parseInt(localStorage.getItem("hintCount3") || "0");
-    const count = parseInt(localStorage.getItem("wrongClicks") || "0");
+    // 演示數據
+    const timeLeft1 = 12.5;
+    const timeLeft2 = 18.3;
+    const timeLeft3 = 25.7;
+    const timeLeft4 = 32.1;
+    const count1 = 2;
+    const count2 = 3;
+    const count3 = 1;
+    const count4 = 4;
+    const count = 5;
 
     document.getElementById('usernameDisplay').textContent = `您好，${username}`;
 
     document.getElementById("test2").addEventListener("click", function () {
       level = "測驗";
-      localStorage.setItem("test", "測驗");
       end(); // 重新渲染畫面
     });
 
     function end(){
       if (level === "測驗") {
-          document.getElementById("username").textContent = `您好，${username}`;
         document.getElementById('usedTime').textContent = calcAverage(timeLeft1, timeLeft2, timeLeft3, timeLeft4).toFixed(2) || '0';
         document.getElementById('usedTime1').textContent = count1 + count2 + count3 + count4 || '0';
         document.getElementById('count').textContent = count;
 
         document.getElementById("test").style.display = "none";
         document.getElementById("test2").style.display = "none";
-         document.getElementById("play").style.display = "block";
+        document.getElementById("exportButtons").style.display = "flex";
         saveGameResultToNewTable();
       } else if(level === "練習"){
-          document.getElementById("username").textContent = `您好，${username}`;
         document.getElementById('usedTime').textContent = calcAverage(timeLeft1, timeLeft2, timeLeft3, timeLeft4).toFixed(2) || '0';
         document.getElementById('usedTime1').textContent = count1 + count2 + count3 + count4 || '0';
         document.getElementById('count').textContent = count;
 
         document.getElementById("test").style.display = "block";
         document.getElementById("test2").style.display = "block";
+        document.getElementById("exportButtons").style.display = "none";
       }
     }
 
@@ -261,48 +301,68 @@
     document.getElementById('usedTime').textContent = avg !== null ? avg.toFixed(2) : "—";
 
     function saveGameResultToNewTable() {
-      const now = new Date();
-      const timestamp = now.toISOString().replace(/[:.]/g, '-');
-      const key = `numberGameResult_${timestamp}`;
-
-      const newRecord = {
-        遊戲玩家名稱: username,
-        嗜好: hobby,
-        遊戲名稱: "數字連線",
-        第一關遊戲1到5總秒數: timeLeft1,
-        第一關遊戲1到5提醒次數: count1,
-        第二關遊戲1到10總秒數: timeLeft2,
-        第二關遊戲1到10提醒次數: count2,
-        第三關遊戲1到15總秒數: timeLeft3,
-        第三關遊戲1到15提醒次數: count3,
-        第四關遊戲1到20總秒數: timeLeft4,
-        第四關遊戲1到15提醒次數: count4,
-        總平均時間: avg !== null ? avg.toFixed(2) : null,
-        錯誤提醒次數: count,
-        時間: now.toLocaleString()
+      // 創建一些演示數據
+      const demoData = {
+        "翻牌": [
+          {
+            遊戲玩家名稱: username,
+            嗜好: hobby,
+            遊戲名稱: "翻牌遊戲",
+            完成時間: "45.2秒",
+            錯誤次數: 3,
+            時間: new Date().toLocaleString()
+          }
+        ],
+        "數字配對": [
+          {
+            遊戲玩家名稱: username,
+            嗜好: hobby,
+            遊戲名稱: "數字配對",
+            完成時間: "38.7秒",
+            配對成功次數: 15,
+            時間: new Date().toLocaleString()
+          }
+        ],
+        "天燈": [
+          {
+            遊戲玩家名稱: username,
+            嗜好: hobby,
+            遊戲名稱: "天燈遊戲",
+            反應時間: "1.2秒",
+            準確度: "95%",
+            時間: new Date().toLocaleString()
+          }
+        ],
+        "數字連線": [
+          {
+            遊戲玩家名稱: username,
+            嗜好: hobby,
+            遊戲名稱: "數字連線",
+            第一關遊戲1到5總秒數: timeLeft1,
+            第一關遊戲1到5提醒次數: count1,
+            第二關遊戲1到10總秒數: timeLeft2,
+            第二關遊戲1到10提醒次數: count2,
+            第三關遊戲1到15總秒數: timeLeft3,
+            第三關遊戲1到15提醒次數: count3,
+            第四關遊戲1到20總秒數: timeLeft4,
+            第四關遊戲1到15提醒次數: count4,
+            總平均時間: avg !== null ? avg.toFixed(2) : null,
+            錯誤提醒次數: count,
+            時間: new Date().toLocaleString()
+          }
+        ]
       };
 
-      localStorage.setItem(key, JSON.stringify([newRecord]));
-
-    let tableList = JSON.parse(localStorage.getItem("numberGameTables") || "[]");
-
-// 避免重複加入
-if (!tableList.includes(key)) {
-  tableList.push(key);
-  localStorage.setItem("numberGameTables", JSON.stringify(tableList));
-}
-
+      // 將演示數據存儲到變數中供匯出使用
+      window.demoGameData = demoData;
     }
 
-    saveGameResultToNewTable();
-
     function clearGame() {
-      const keys = ["duration", "duration1", "duration2", "duration3", "wrongClicks", "hintCount","hintCount1","hintCount2","hintCount3"];
-      keys.forEach(k => localStorage.removeItem(k));
+      // 清除遊戲數據的邏輯
+      console.log("清除遊戲數據");
     }
 
     function logout() {
-      localStorage.clear();
       location.href = "../index.html";
     }
 
@@ -329,31 +389,98 @@ if (!tableList.includes(key)) {
       return html;
     }
 
+    // 匯出全部遊戲資料為 Excel
+    function exportAllGameExcel() {
+      const gameData = window.demoGameData || {};
+      
+      if (Object.keys(gameData).length === 0) {
+        alert("目前沒有資料可匯出！");
+        return;
+      }
+
+      // 創建一個新的工作簿
+      const workbook = XLSX.utils.book_new();
+
+      // 為每個遊戲類型創建一個工作表
+      for (const [gameName, records] of Object.entries(gameData)) {
+        if (records && records.length > 0) {
+          const worksheet = XLSX.utils.json_to_sheet(records);
+          
+          // 調整欄位寬度
+          const colWidths = [];
+          const keys = Object.keys(records[0]);
+          keys.forEach((key, index) => {
+            let maxLength = key.length;
+            records.forEach(row => {
+              const cellValue = String(row[key] || '');
+              if (cellValue.length > maxLength) {
+                maxLength = cellValue.length;
+              }
+            });
+            colWidths[index] = { width: Math.min(maxLength + 2, 30) };
+          });
+          worksheet['!cols'] = colWidths;
+          
+          XLSX.utils.book_append_sheet(workbook, worksheet, gameName);
+        }
+      }
+
+      // 創建綜合工作表
+      const allRecords = [];
+      for (const [gameName, records] of Object.entries(gameData)) {
+        if (records && records.length > 0) {
+          records.forEach(record => {
+            allRecords.push({ 遊戲類型: gameName, ...record });
+          });
+        }
+      }
+
+      if (allRecords.length > 0) {
+        const allWorksheet = XLSX.utils.json_to_sheet(allRecords);
+        
+        // 調整綜合表的欄位寬度
+        const colWidths = [];
+        const keys = Object.keys(allRecords[0]);
+        keys.forEach((key, index) => {
+          let maxLength = key.length;
+          allRecords.forEach(row => {
+            const cellValue = String(row[key] || '');
+            if (cellValue.length > maxLength) {
+              maxLength = cellValue.length;
+            }
+          });
+          colWidths[index] = { width: Math.min(maxLength + 2, 30) };
+        });
+        allWorksheet['!cols'] = colWidths;
+        
+        XLSX.utils.book_append_sheet(workbook, allWorksheet, '全部遊戲紀錄');
+      }
+
+      // 匯出 Excel 檔案
+      const fileName = `all_game_results_${username}_${new Date().toISOString().slice(0,10)}.xlsx`;
+      XLSX.writeFile(workbook, fileName);
+    }
+
     // 匯出全部遊戲資料為 PDF
     function exportAllGameTables() {
-      const gameTablesMap = {
-        "翻牌": JSON.parse(localStorage.getItem("flipCardTables") || "[]"),
-        "數字配對": JSON.parse(localStorage.getItem("numberMatchTables") || "[]"),
-        "天燈": JSON.parse(localStorage.getItem("gameTables") || "[]"),
-        "數字連線": JSON.parse(localStorage.getItem("numberGameTables") || "[]"),
-      };
+      const gameData = window.demoGameData || {};
+      
+      if (Object.keys(gameData).length === 0) {
+        alert("目前沒有資料可匯出！");
+        return;
+      }
 
       const allRecords = [];
       let pdfTablesHtml = '';
 
-      for (const [gameName, tableList] of Object.entries(gameTablesMap)) {
-        let gameRecords = [];
-        for (const tableKey of tableList) {
-          const records = JSON.parse(localStorage.getItem(tableKey) || "[]");
+      for (const [gameName, records] of Object.entries(gameData)) {
+        if (records && records.length > 0) {
           records.forEach(record => {
             allRecords.push({ 遊戲類型: gameName, ...record });
-            gameRecords.push(record);
           });
-        }
 
-        if (gameRecords.length > 0) {
           pdfTablesHtml += `<h3>${gameName}</h3>`;
-          pdfTablesHtml += generateHTMLTable(gameRecords);
+          pdfTablesHtml += generateHTMLTable(records);
         }
       }
 
@@ -373,7 +500,7 @@ if (!tableList.includes(key)) {
 
       const opt = {
         margin:       0.5,
-        filename:     `all_game_results_${username}.pdf`,
+        filename:     `all_game_results_${username}_${new Date().toISOString().slice(0,10)}.pdf`,
         image:        { type: 'jpeg', quality: 0.98 },
         html2canvas:  { scale: 2 },
         jsPDF:        { unit: 'in', format: 'a4', orientation: 'portrait' }
@@ -384,6 +511,9 @@ if (!tableList.includes(key)) {
         pdfTablesDiv.innerHTML = '';
       });
     }
+
+    // 初始化演示數據
+    saveGameResultToNewTable();
   </script>
 </body>
 </html>
