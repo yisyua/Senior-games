@@ -1,345 +1,403 @@
 <!DOCTYPE html>
 <html lang="zh-Hant">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>遊戲結束</title>
-  <style>
-    /* 你的 CSS 完整保留 */
-    * {
-      box-sizing: border-box;
-    }
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>遊戲結果 - 記憶翻牌</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@500;700;900&display=swap" rel="stylesheet">
+    <style>
+        /* --- 全局設定與背景 --- */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
 
-    html, body {
-      margin: 0;
-      padding: 0;
-      height: 100%;
-      overflow: hidden; /* 不顯示滾輪 */
-      font-family: "標楷體", "Microsoft JhengHei", "Noto Sans TC", sans-serif;
-      background-color: #f9fbfc;
-      color: #000;
-    }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Microsoft JhengHei", "PingFang TC", "Noto Sans TC", sans-serif;
+            background-color: #e8f5e9; /* 淺綠色背景 */
+            color: #333;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 1rem;
+            position: relative;
+        }
+        
+        /* 增加綠色光點背景效果 */
+        body::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                radial-gradient(circle at 10% 90%, rgba(76, 175, 80, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 90% 10%, rgba(129, 199, 132, 0.15) 0%, transparent 50%);
+            pointer-events: none;
+            z-index: 0;
+        }
 
-    body {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      padding: 1rem;
-      min-height: 100vh;
-    }
+        /* --- 主要內容容器 --- */
+        .container {
+            background-color: #ffffff;
+            padding: 40px;
+            border-radius: 25px;
+            width: 100%;
+            max-width: 650px;
+            text-align: center;
+            box-shadow: 0 15px 30px rgba(46, 125, 50, 0.2);
+            position: relative;
+            z-index: 1;
+            transform: translateY(0);
+            transition: transform 0.3s ease-out;
+        }
 
-    .container {
-      background-color: #ffffff;
-      padding: 2.5rem 2rem;
-      border-radius: 20px;
-      width: 100%;
-      max-width: 600px;
-      text-align: center;
-      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
-      overflow: hidden;
-    }
+        h1 {
+            font-size: 3rem;
+            margin-bottom: 30px;
+            color: #388e3c; /* 較深的綠色標題 */
+            font-weight: 700;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.05);
+            font-family: 'Noto Serif TC', serif;
+        }
 
-    h1 {
-      font-size: 2.8rem;
-      margin-bottom: 2rem;
-      color: #667788;
-    }
+        /* --- 結果總結區塊 --- */
+        .result-box1 {
+            background: linear-gradient(135deg, #a5d6a7, #66bb6a); /* 綠色漸層 */
+            color: #fff;
+            padding: 25px;
+            border-radius: 18px;
+            margin-bottom: 25px;
+            font-weight: bold;
+            box-shadow: 0 8px 15px rgba(76, 175, 80, 0.4);
+        }
 
-    .result-box, .result-box1 {
-      font-size: 1.8rem;
-      margin-bottom: 2rem;
-      padding: 1.8rem;
-      border-radius: 15px;
-      text-align: left;
-      word-break: break-word;
-    }
+        .result-box1 div {
+            font-size: 1.6rem;
+            margin: 10px 0;
+        }
 
-    .result-box {
-      background-color: #f0f0f0;
-      color: #555;
-    }
+        .result-box1 span {
+            font-size: 2.5rem; /* 突顯總數據 */
+            display: inline-block;
+            margin-left: 10px;
+        }
 
-    .result-box1 {
-      background-color: #e6e6e6;
-      color: #444;
-      font-weight: bold;
-    }
+        /* --- 詳細數據區塊 (預設隱藏) --- */
+        .result-box-detail {
+            background-color: #f8fcf8;
+            color: #555;
+            padding: 20px;
+            border-radius: 15px;
+            margin-top: 20px;
+            border: 1px solid #dcdcdc;
+            text-align: left;
+            font-size: 1.2rem;
+            transition: all 0.3s ease;
+        }
 
-    .buttons {
-      display: flex;
-      flex-direction: row; /* 水平排列 */
-      justify-content: center; /* 置中 */
-      gap: 1rem; /* 按鈕間距 */
-      flex-wrap: wrap; /* 窄螢幕自動換行 */
-      margin-top: 1.5rem;
-    }
+        .result-box-detail strong {
+            color: #388e3c;
+            font-weight: 700;
+        }
+        
+        /* 顯示/隱藏詳細數據的按鈕 */
+        #toggleDetailBtn {
+            font-size: 1rem;
+            padding: 8px 15px;
+            background-color: #e0e0e0;
+            color: #555;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            margin-top: 15px;
+            transition: background-color 0.2s;
+            display: block;
+            width: 100%;
+        }
+        #toggleDetailBtn:hover {
+            background-color: #ccc;
+        }
 
-    .buttons button {
-      flex: 1 1 140px; /* 最小寬度140px，自動拉伸 */
-      max-width: 180px;
-      font-size: 1.6rem;
-      padding: 1rem 1.2rem;
-      border: none;
-      border-radius: 12px;
-      cursor: pointer;
-      font-weight: bold;
-      color: #333;
-      background-color: #ddd;
-      font-family: "標楷體", "Microsoft JhengHei", "Noto Sans TC", sans-serif;
-      transition: background-color 0.2s ease;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      box-shadow: none;
-      user-select: none;
-    }
+        /* --- 按鈕區塊 --- */
+        .buttons {
+            display: block; /* 改為 block 方便單一按鈕置中 */
+            margin-top: 30px;
+        }
+        
+        /* 統一設定按鈕樣式 */
+        .next-game-btn { /* 新增 class 名稱 */
+            font-size: 1.5rem; /* 稍微大一點 */
+            padding: 15px 30px;
+            border: none;
+            border-radius: 15px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            text-transform: none;
+            white-space: nowrap;
+            /* 下一個遊戲按鈕的樣式 */
+            background-color: #4caf50; /* 成功綠 */
+            color: white;
+            width: 100%; /* 讓它佔滿寬度 */
+            max-width: 400px; /* 限制最大寬度，避免過寬 */
+            margin: 0 auto; /* 置中 */
+            display: block;
+        }
+        
+        .next-game-btn:hover {
+            background-color: #388e3c;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15);
+        }
 
-    .buttons button:hover {
-      background-color: #ccc;
-    }
+        /* --- 用戶資訊 (隱藏) --- */
+        .user-info {
+            /* 保持原樣式但強制隱藏 */
+            display: none !important; 
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            font-size: 1.2rem;
+            background-color: #ffffffed;
+            padding: 12px 20px;
+            border-radius: 15px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            align-items: center;
+            max-width: 350px;
+            z-index: 10;
+        }
 
-    .user-info {
-      position: fixed;
-      top: 1rem;
-      right: 1rem;
-      font-size: 1.5rem;
-      background-color: #ffffffcc;
-      padding: 1rem;
-      border-radius: 12px;
-      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
-      display: flex;
-      align-items: center;
-      max-width: 300px;
-      overflow: hidden;
-      white-space: nowrap;
-      text-overflow: ellipsis;
-    }
 
-    .user-info button {
-      margin-left: 1rem;
-      font-size: 1.2rem;
-      padding: 0.6rem 1.2rem;
-      border: none;
-      background-color: #e0e0e0;
-      border-radius: 8px;
-      cursor: pointer;
-      transition: background-color 0.2s ease;
-      user-select: none;
-    }
-
-    .user-info button:hover {
-      background-color: #ccc;
-    }
-
-    @media (max-width: 600px) {
-      h1 {
-        font-size: 2.2rem;
-      }
-      .result-box, .result-box1 {
-        font-size: 1.4rem;
-        padding: 1.2rem;
-      }
-      .buttons button {
-        font-size: 1.4rem;
-        flex: 1 1 120px;
-        max-width: 150px;
-      }
-      .user-info {
-        font-size: 1.2rem;
-        max-width: 180px;
-        padding: 0.8rem;
-      }
-      .user-info button {
-        font-size: 1rem;
-        padding: 0.4rem 0.8rem;
-        margin-left: 0.5rem;
-      }
-    }
-  </style>
-  <script src="https://cdn.sheetjs.com/xlsx-latest/package/dist/xlsx.full.min.js"></script>
+        /* RWD 調整 */
+        @media (max-width: 600px) {
+            .container {
+                padding: 30px 20px;
+                max-width: 95%;
+            }
+            h1 {
+                font-size: 2.5rem;
+            }
+            .result-box1 span {
+                font-size: 2rem;
+            }
+            .result-box1 div {
+                font-size: 1.4rem;
+            }
+            .buttons {
+                margin-top: 20px;
+            }
+            .next-game-btn {
+                font-size: 1.3rem;
+                padding: 15px;
+            }
+        }
+    </style>
 </head>
 <body onload="end()">
-  <div class="user-info" title="用戶資訊">
-    <span id="username"></span>
-    <button onclick="logout()">登出</button>
-  </div>
+    <div class="user-info" title="用戶資訊" style="display: none;"> 
+        <span id="username"></span>
+        <button onclick="logout()">登出</button>
+    </div>
     
-  <div class="container">
-    <h1>遊戲結果</h1>
-    <div class="result-box1">
-      <div style="font-size: 25px;">平均用時：<span id="usedTime" style="font-size: 25px;"></span> 秒</div>
-      <div style="font-size: 25px;">總提醒次數：<span id="count3" style="font-size: 25px;"></span> 次</div>
+    <div class="container">
+        <h1>記憶翻牌挑戰 - 結算</h1>
+        
+        <div class="result-box1">
+            <div>🎉 您的總成績 🎉</div>
+            <div>
+                總用時：<span id="totalTime">0</span> 秒
+            </div>
+            <div>
+                總提醒次數：<span id="totalCount">0</span> 次
+            </div>
+        </div>
+        
+        <button id="toggleDetailBtn" onclick="toggleDetail()">顯示詳細數據</button>
+        <div class="result-box-detail" id="detailBox" style="display: none;">
+            <div>關卡 1 (4對卡牌) 用時：<strong id="timeL1">0</strong> 秒 / 提醒次數：<strong id="countL1">0</strong> 次</div>
+            <div>關卡 2 (6對卡牌) 用時：<strong id="timeL2">0</strong> 秒 / 提醒次數：<strong id="countL2">0</strong> 次</div>
+            <div>關卡 3 (8對卡牌) 用時：<strong id="timeL3">0</strong> 秒 / 提醒次數：<strong id="countL3">0</strong> 次</div>
+        </div>
+
+        <div class="buttons">
+             <button class="next-game-btn" onclick="goToNextGame()">下一個遊戲</button> 
+        </div>
     </div>
 
-    <div class="buttons">
-      <button class="exit-btn" onclick="location.href='game/3changecard.html';clearData()" id="test" style="display: none;">再練習</button>
-      <button class="exit-btn" onclick="location.href='game/4changecard.html';clearData()" id="test2" style="display: none;">進入測試</button>
-      <button class="exit-btn" onclick="location.href='../sky lantern/Home screen.html';" id="play" style="display: none;">下一個遊戲</button>
-    </div>
-  </div>
+    <script>
+    // 讀取用戶資訊
+    const username = localStorage.getItem("nickname") || "訪客";
+    const hobby = localStorage.getItem("other") || localStorage.getItem("hobby");
 
-  <script>
-  // 讀取用戶資訊
-  const username = localStorage.getItem("nickname") || "訪客";
-  const hobby = localStorage.getItem("other");
-  const habit = localStorage.getItem("hobby");
+    // 獲取各關卡總時間（秒）
+    const getTime1 = localStorage.getItem("reminderTime") ? parseInt(localStorage.getItem("reminderTime")) : 0;
+    const getTime2 = localStorage.getItem("reminderTime2") ? parseInt(localStorage.getItem("reminderTime2")) : 0;
+    const getTime3 = localStorage.getItem("reminderTime3") ? parseInt(localStorage.getItem("reminderTime3")) : 0;
 
-
-  // 讀取遊戲時間與提醒次數
-  const timeLeft1 = localStorage.getItem("reminderTime");
-  const timeLeft2 = localStorage.getItem("reminderTime2");
-  const timeLeft3 = localStorage.getItem("reminderTime3");
-  const count1 = localStorage.getItem("reminderCount") || "0";
-  const count2 = localStorage.getItem("reminderCount1") || "0";
-  const count3 = localStorage.getItem("reminderCount2") || "0";
-
-  // 將 level 改為可變動的變數
-  let level = localStorage.getItem("test") || "練習";
-
-  // 計算平均時間
-  function calcAverage(t1, t2, t3) {
-    return ((parseInt(t1) + parseInt(t2) + parseInt(t3)) / 3).toFixed(2);
-  }
-
-  // 切換到測驗模式
-  document.getElementById("test2").addEventListener("click", function () {
-    level = "測驗";
-    localStorage.setItem("test", "測驗");
-    end(); // 重新渲染畫面
-  });
-
-  // 顯示遊戲結果與按鈕
-  function end() {
-    if (level === "測驗") {
-        document.getElementById("username").textContent = `您好，${username}`;
-      if (timeLeft1 && timeLeft2 && timeLeft3) {
-        document.getElementById("usedTime").textContent = calcAverage(timeLeft1, timeLeft2, timeLeft3) || '0';
-      }
-
-      // 正確加總提醒次數
-      document.getElementById("count3").textContent =
-        Number(count1) + Number(count2) + Number(count3) || '0';
-
-      // 顯示「下一關」
-      document.getElementById("play").style.display = "block";
-
-      // 隱藏練習按鈕
-      document.getElementById("test").style.display = "none";
-      document.getElementById("test2").style.display = "none";
-
-      saveGameResult();
-    } else if (level === "練習") {
-        document.getElementById("username").textContent = `您好，${username}`;
-      if (timeLeft1) {
-        document.getElementById("usedTime").textContent = timeLeft1 || '0';
-      }
-
-      document.getElementById("count3").textContent =
-        Number(count1) + Number(count2) + Number(count3) || '0';
-
-      // 顯示「再練習」與「進入測驗」
-      document.getElementById("test").style.display = "block";
-      document.getElementById("test2").style.display = "block";
-
-      // 隱藏「下一關」
-      document.getElementById("play").style.display = "none";
-    }
-  }
-
-  // 載入時執行一次
-  window.onload = end;
-
-  // 儲存遊戲結果到多表模式
-  function saveGameResult() {
-    const newRecord = {
-      遊戲玩家名稱: username,
-      嗜好: hobby || habit,
-      遊戲名稱: "翻牌",
-      第一關遊戲4對卡牌與3對卡牌總秒數: timeLeft1 || null,
-      第一關遊戲4對卡牌與3對卡牌提醒次數: count1,
-      第二關遊戲6對卡牌總秒數: timeLeft2 || null,
-      第二關遊戲6對卡牌提醒次數: count2,
-      第三關遊戲8對卡牌總秒數: timeLeft3 || null,
-      第三關遊戲8對卡牌提醒次數: count3,
-      總平均時間: (timeLeft1 && timeLeft2 && timeLeft3) ? calcAverage(timeLeft1, timeLeft2, timeLeft3) : (timeLeft1 || null),
-      時間: new Date().toLocaleString()
-    };
-
-    // 用當天日期+關卡組合成表 key
-    const dateStr = new Date().toISOString().slice(0, 10);
-    const tableKey = `flipcard_${level}_${dateStr}`;
-
-    // 取出現有表清單，沒就建立一個陣列
-    let tableList = JSON.parse(localStorage.getItem("flipCardTables") || "[]");
-
-    // 如果新表 key 不在清單裡就加入
-    if (!tableList.includes(tableKey)) {
-      tableList.push(tableKey);
-      localStorage.setItem("flipCardTables", JSON.stringify(tableList));
+    // 修正提醒次數的讀取邏輯
+    function getReminderCount(level) {
+        // 檢查多種可能的鍵名格式
+        const possibleKeys = [
+            `reminderCount${level === 1 ? '' : level === 2 ? '1' : '2'}`, // 原邏輯
+            `reminderCount_level${level}`, // 可能的格式
+            `reminderCount${level}`, // 另一種可能格式
+            `level${level}_reminderCount` // 又一種可能格式
+        ];
+        
+        for (let key of possibleKeys) {
+            const value = localStorage.getItem(key);
+            if (value !== null && !isNaN(parseInt(value))) {
+                console.log(`找到提醒次數 關卡${level}: ${key} = ${value}`);
+                return parseInt(value);
+            }
+        }
+        
+        console.log(`未找到關卡${level}的提醒次數記錄`);
+        return 0;
     }
 
-    // 讀出該表已有的紀錄
-    let oldRecords = JSON.parse(localStorage.getItem(tableKey) || "[]");
-    oldRecords.push(newRecord);
+    // 獲取各關卡提醒次數 - 使用修正後的邏輯
+    const getCount1 = getReminderCount(1);
+    const getCount2 = getReminderCount(2);
+    const getCount3 = getReminderCount(3);
 
-    // 存回 localStorage
-    localStorage.setItem(tableKey, JSON.stringify(oldRecords));
-  }
+    // 總計
+    const totalTime = getTime1 + getTime2 + getTime3;
+    const totalCount = getCount1 + getCount2 + getCount3;
 
-  // 清除遊戲相關暫存
-  function clearGame() {
-    localStorage.removeItem("reminderTime");
-    localStorage.removeItem("reminderTime2");
-    localStorage.removeItem("reminderTime3");
-    localStorage.removeItem("reminderCount");
-    localStorage.removeItem("reminderCount2");
-    localStorage.removeItem("reminderCount3");
-  }
+    // 將 level 改為可變動的變數
+    let level = localStorage.getItem("test") || "練習";
 
-  // 清除所有 localStorage 並跳轉登入頁
-  function clearData() {
-    localStorage.clear();
-  }
+    // 顯示或隱藏詳細數據
+    function toggleDetail() {
+        const detailBox = document.getElementById("detailBox");
+        const button = document.getElementById("toggleDetailBtn");
+        if (detailBox.style.display === "none") {
+            detailBox.style.display = "block";
+            button.textContent = "隱藏詳細數據";
+        } else {
+            detailBox.style.display = "none";
+            button.textContent = "顯示詳細數據";
+        }
+    }
 
-  function logout() {
-    clearData();
-    location.href = "../index.html";
-  }
+    // 進入下一個遊戲的函數
+    function goToNextGame() {
+        // 確保測驗模式的數據在跳轉前儲存
+        if (level === "測驗" && getTime1 > 0 && getTime2 > 0 && getTime3 > 0) {
+            saveGameResult(); 
+        } else {
+             // 非測驗模式或數據不全，也清除單次遊戲數據
+            clearGameData();
+        }
+        // 清除測驗模式標記，確保下次進入遊戲是練習模式
+        localStorage.removeItem("test"); 
+        
+        // 跳轉到下一個遊戲的 Home screen
+        location.href='../sky lantern/Home screen.html';
+    }
 
-  // 匯出所有翻牌遊戲紀錄為 Excel（多表合併）
-  function exportGameData() {
-  const tableList = JSON.parse(localStorage.getItem("flipCardTables") || "[]");
-  if (tableList.length === 0) {
-    alert("沒有遊戲紀錄可匯出！");
-    return;
-  }
+    // 顯示遊戲結果
+    function end() {
+        // 顯示用戶名 (雖然區塊被隱藏，但數據仍在變數中)
+        document.getElementById("username").textContent = `您好，${username}`;
 
-  const allRecords = [];
+        // 顯示總結數據
+        document.getElementById("totalTime").textContent = totalTime;
+        document.getElementById("totalCount").textContent = totalCount;
+        
+        // 顯示詳細關卡數據
+        document.getElementById("timeL1").textContent = getTime1;
+        document.getElementById("countL1").textContent = getCount1;
+        document.getElementById("timeL2").textContent = getTime2;
+        document.getElementById("countL2").textContent = getCount2;
+        document.getElementById("timeL3").textContent = getTime3;
+        document.getElementById("countL3").textContent = getCount3;
+        
+        // 測驗模式完成時儲存數據 (即使沒有「下一關」按鈕，數據也應在完成時儲存)
+        if (level === "測驗" && getTime1 > 0 && getTime2 > 0 && getTime3 > 0) {
+            // saveGameResult() 會在 goToNextGame() 中呼叫
+            console.log("測驗模式數據完整，將在跳轉下一關時儲存並清除單次遊戲數據。");
+        } else if (level === "測驗") {
+            // 測驗模式數據不完整，清除現有數據，避免錯誤累積
+            console.log("測驗模式數據不完整，清除單次遊戲數據。");
+            clearGameData();
+        }
+        // 練習模式則不儲存，直接跳轉即可
+    }
 
-  for (const key of tableList) {
-    // ✅ 跳過包含「練習」的表格名稱
-    if (key.includes("練習")) continue;
+    // 載入時執行一次
+    window.onload = end;
 
-    const records = JSON.parse(localStorage.getItem(key) || "[]");
-    records.forEach(r => {
-      allRecords.push({ 表名: "翻牌", ...r });
-    });
-  }
+    // 儲存遊戲結果到多表模式 (僅限測驗模式完成時)
+    function saveGameResult() {
+        // ... (保持原有的 saveGameResult 邏輯)
+        const newRecord = {
+            遊戲玩家名稱: username,
+            嗜好: hobby,
+            遊戲名稱: "翻牌",
+            第一關用時: getTime1,
+            第一關提醒次數: getCount1,
+            第二關用時: getTime2,
+            第二關提醒次數: getCount2,
+            第三關用時: getTime3,
+            第三關提醒次數: getCount3,
+            總時間加總: totalTime,
+            總提醒次數: totalCount,
+            完成時間: new Date().toLocaleString()
+        };
 
-  if (allRecords.length === 0) {
-    alert("沒有【測驗模式】的紀錄可匯出！");
-    return;
-  }
+        const dateStr = new Date().toISOString().slice(0, 10);
+        const tableKey = `flipcard_測驗_${dateStr}`;
 
-  const ws = XLSX.utils.json_to_sheet(allRecords);
-  const wb = XLSX.utils.book_new();
-  XLSX.utils.book_append_sheet(wb, ws, "翻牌遊戲紀錄");
-  XLSX.writeFile(wb, `game_results_${username}.xlsx`);
-}
+        let tableList = JSON.parse(localStorage.getItem("flipCardTables") || "[]");
 
-</script>
+        if (!tableList.includes(tableKey)) {
+            tableList.push(tableKey);
+            localStorage.setItem("flipCardTables", JSON.stringify(tableList));
+        }
 
+        let oldRecords = JSON.parse(localStorage.getItem(tableKey) || "[]");
+        oldRecords.push(newRecord);
+
+        localStorage.setItem(tableKey, JSON.stringify(oldRecords));
+        console.log("測驗結果已儲存:", newRecord);
+        
+        // 測驗模式完成後，清除單次遊戲數據
+        clearGameData();
+    }
+
+    // 清除單次遊戲相關暫存
+    function clearGameData() {
+        // ... (保持原有的 clearGameData 邏輯)
+        const keysToRemove = [
+            "reminderTime", "reminderTime2", "reminderTime3",
+            "reminderCount", "reminderCount1", "reminderCount2",
+            "reminderCount_level1", "reminderCount_level2", "reminderCount_level3",
+            "level1_reminderCount", "level2_reminderCount", "level3_reminderCount"
+        ];
+        
+        keysToRemove.forEach(key => {
+            localStorage.removeItem(key);
+        });
+        localStorage.removeItem("test"); // 清除模式標記
+    }
+
+    // 清除所有 localStorage 並跳轉登入頁 (僅用於登出，但現在登出已隱藏)
+    function clearData() {
+        localStorage.clear();
+    }
+
+    function logout() {
+        clearData();
+        location.href = "../index.html";
+    }
+
+    </script>
 </body>
 </html>
-
-
