@@ -63,9 +63,9 @@
         .particle:nth-child(3) { left: 30%; animation-delay: 2s; animation-duration: 7s; }
         .particle:nth-child(4) { left: 40%; animation-delay: 3s; animation-duration: 9s; }
         .particle:nth-child(5) { left: 50%; animation-delay: 4s; animation-duration: 11s; }
-        .particle:nth-child(6) { left: 60%; animation-delay: 5s; animation-duration: 8s; }
-        .particle:nth-child(7) { left: 70%; animation-delay: 6s; animation-duration: 10s; }
-        .particle:nth-child(8) { left: 80%; animation-delay: 7s; animation-duration: 9s; }
+        .particle:nth-child(6) { left: 60%; animation-delay: 5s; animation-duration: 10s; }
+        .particle:nth-child(7) { left: 70%; animation-delay: 6s; animation-duration: 9s; }
+        .particle:nth-child(8) { left: 80%; animation-delay: 7s; animation-duration: 8s; }
         
         @keyframes float {
             0%, 100% { 
@@ -107,13 +107,16 @@
                 0 15px 40px rgba(0, 0, 0, 0.1),
                 inset 0 2px 0 rgba(255, 255, 255, 0.8),
                 inset 0 -2px 0 rgba(0, 0, 0, 0.05);
-            padding: 60px 50px;
+            padding: 40px 60px;
             width: 100%;
-            /* 調整：增加最大寬度以適應橫向平板 */
-            max-width: 1000px; 
+            /* 針對平板橫向優化的尺寸 */
+            max-width: 1200px;
+            min-height: 600px;
             animation: containerEntry 1.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             position: relative;
             overflow: hidden;
+            display: flex;
+            flex-direction: column;
         }
         
         .login-container::before {
@@ -138,7 +141,7 @@
         @keyframes containerEntry {
             from {
                 opacity: 0;
-                transform: translateY(100px) scale(0.9) rotateX(15deg);
+                transform: translateY(50px) scale(0.95) rotateX(10deg);
             }
             to {
                 opacity: 1;
@@ -148,21 +151,22 @@
         
         .login-header {
             text-align: center;
-            margin-bottom: 50px;
+            margin-bottom: 30px;
             position: relative;
             z-index: 3;
+            flex-shrink: 0;
         }
         
         .logo-container {
             position: relative;
             display: inline-block;
-            margin-bottom: 25px;
+            margin-bottom: 15px;
         }
         
         .logo-ring {
-            width: 120px;
-            height: 120px;
-            border: 4px solid transparent;
+            width: 80px;
+            height: 80px;
+            border: 3px solid transparent;
             border-image: linear-gradient(45deg, #4caf50, #81c784, #4caf50) 1;
             border-radius: 50%;
             display: flex;
@@ -177,10 +181,10 @@
         .logo-ring::before {
             content: '';
             position: absolute;
-            top: -6px;
-            left: -6px;
-            right: -6px;
-            bottom: -6px;
+            top: -4px;
+            left: -4px;
+            right: -4px;
+            bottom: -4px;
             background: conic-gradient(from 0deg, #4caf50, #81c784, #a5d6a7, #4caf50);
             border-radius: 50%;
             z-index: -1;
@@ -193,7 +197,7 @@
         }
         
         .main-icon {
-            font-size: 4.5rem;
+            font-size: 2.8rem;
             background: linear-gradient(135deg, #2e7d32, #4caf50, #81c784);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
@@ -208,8 +212,8 @@
         }
         
         .login-header h1 {
-            font-size: 3.5rem;
-            margin: 0 0 15px 0;
+            font-size: 2.8rem;
+            margin: 0 0 10px 0;
             font-weight: 800;
             background: linear-gradient(135deg, #1b5e20, #2e7d32, #388e3c, #4caf50);
             -webkit-background-clip: text;
@@ -226,59 +230,63 @@
         }
         
         .subtitle {
-            font-size: 1.6rem;
+            font-size: 1.3rem;
             color: #2e7d32;
             font-weight: 600;
-            margin-bottom: 20px;
+            margin-bottom: 10px;
             opacity: 0.9;
             animation: subtitleFloat 6s ease-in-out infinite;
         }
         
         @keyframes subtitleFloat {
             0%, 100% { transform: translateY(0px); }
-            50% { transform: translateY(-5px); }
+            50% { transform: translateY(-3px); }
         }
         
         .welcome-message {
-            font-size: 1.2rem;
+            font-size: 1rem;
             color: #4caf50;
             font-weight: 500;
-            margin-top: 10px;
+            margin-top: 5px;
             opacity: 0.8;
         }
         
         .form-container {
             position: relative;
             z-index: 3;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
         }
         
-        .form-row {
-            display: flex;
-            gap: 30px;
-            margin-bottom: 35px;
-            flex-wrap: wrap; /* 允許換行以處理不同寬度 */
+        /* 主要表單區域使用 Grid 佈局 */
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            grid-template-rows: auto auto auto;
+            gap: 25px 40px;
+            margin-bottom: 30px;
         }
         
         .form-group {
-            flex: 1;
-            min-width: 280px;
             position: relative;
         }
         
+        /* 其他活動輸入框橫跨兩欄 */
         .form-group.full-width {
-            width: 100%;
-            flex: none;
+            grid-column: span 2;
         }
         
         .form-label {
             display: block;
-            font-size: 1.6rem;
+            font-size: 1.4rem;
             font-weight: 700;
             color: #1b5e20;
-            margin-bottom: 15px;
+            margin-bottom: 12px;
             text-align: left;
             position: relative;
-            padding-left: 40px;
+            padding-left: 35px;
         }
         
         .form-label::before {
@@ -287,7 +295,7 @@
             left: 0;
             top: 50%;
             transform: translateY(-50%);
-            font-size: 1.8rem;
+            font-size: 1.5rem;
             background: linear-gradient(135deg, #4caf50, #81c784);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
@@ -297,10 +305,10 @@
         .form-input,
         .form-select {
             width: 100%;
-            padding: 25px 20px;
-            font-size: 1.4rem;
-            border: 3px solid #c8e6c9;
-            border-radius: 20px;
+            padding: 18px 16px;
+            font-size: 1.2rem;
+            border: 2px solid #c8e6c9;
+            border-radius: 15px;
             background: 
                 linear-gradient(145deg, #ffffff, #f8fff8),
                 radial-gradient(circle at 80% 20%, rgba(76, 175, 80, 0.05), transparent 50%);
@@ -308,8 +316,8 @@
             font-family: inherit;
             font-weight: 500;
             box-shadow: 
-                inset 3px 3px 10px rgba(0, 0, 0, 0.05),
-                0 3px 15px rgba(76, 175, 80, 0.1);
+                inset 2px 2px 8px rgba(0, 0, 0, 0.05),
+                0 2px 12px rgba(76, 175, 80, 0.1);
             position: relative;
         }
         
@@ -318,10 +326,10 @@
             border-color: #4caf50;
             outline: none;
             box-shadow: 
-                0 0 0 5px rgba(76, 175, 80, 0.2),
-                inset 3px 3px 10px rgba(0, 0, 0, 0.05),
-                0 8px 25px rgba(76, 175, 80, 0.3);
-            transform: translateY(-5px) scale(1.02);
+                0 0 0 4px rgba(76, 175, 80, 0.2),
+                inset 2px 2px 8px rgba(0, 0, 0, 0.05),
+                0 6px 20px rgba(76, 175, 80, 0.3);
+            transform: translateY(-3px) scale(1.01);
             background: 
                 linear-gradient(145deg, #ffffff, #f0fff0),
                 radial-gradient(circle at 80% 20%, rgba(76, 175, 80, 0.1), transparent 50%);
@@ -330,7 +338,7 @@
         .form-input::placeholder {
             color: #81c784;
             font-weight: 400;
-            font-size: 1.2rem;
+            font-size: 1.1rem;
         }
         
         .form-select {
@@ -340,15 +348,15 @@
                 url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%234caf50' stroke-linecap='round' stroke-linejoin='round' stroke-width='2.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e"),
                 linear-gradient(145deg, #ffffff, #f8fff8),
                 radial-gradient(circle at 80% 20%, rgba(76, 175, 80, 0.05), transparent 50%);
-            background-position: right 20px center, 0 0, 0 0;
+            background-position: right 16px center, 0 0, 0 0;
             background-repeat: no-repeat, no-repeat, no-repeat;
-            background-size: 24px, 100%, 100%;
-            padding-right: 60px;
+            background-size: 20px, 100%, 100%;
+            padding-right: 50px;
         }
         
         .other-input {
             display: none;
-            margin-top: 20px;
+            margin-top: 15px;
             animation: slideDown 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
         
@@ -359,38 +367,39 @@
         @keyframes slideDown {
             from {
                 opacity: 0;
-                transform: translateY(-30px) scale(0.95);
+                transform: translateY(-20px) scale(0.95);
                 max-height: 0;
             }
             to {
                 opacity: 1;
                 transform: translateY(0) scale(1);
-                max-height: 200px;
+                max-height: 100px;
             }
         }
         
         .submit-button {
             width: 100%;
-            padding: 28px;
+            padding: 20px;
             background: 
                 linear-gradient(135deg, #4caf50 0%, #388e3c 50%, #2e7d32 100%),
                 radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.2), transparent 60%);
             border: none;
-            border-radius: 25px;
-            font-size: 2rem;
+            border-radius: 20px;
+            font-size: 1.6rem;
             font-weight: 800;
             color: white;
             cursor: pointer;
             transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             font-family: inherit;
-            margin-top: 40px;
+            margin-top: 20px;
             position: relative;
             overflow: hidden;
             box-shadow: 
-                0 15px 35px rgba(76, 175, 80, 0.4),
-                0 5px 15px rgba(0, 0, 0, 0.1),
+                0 12px 28px rgba(76, 175, 80, 0.4),
+                0 4px 12px rgba(0, 0, 0, 0.1),
                 inset 0 2px 0 rgba(255, 255, 255, 0.3);
             text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+            align-self: stretch;
         }
         
         .submit-button::before {
@@ -422,15 +431,15 @@
         }
         
         .submit-button:hover::after {
-            width: 300px;
-            height: 300px;
+            width: 250px;
+            height: 250px;
         }
         
         .submit-button:hover {
-            transform: translateY(-8px) scale(1.02);
+            transform: translateY(-5px) scale(1.01);
             box-shadow: 
-                0 25px 50px rgba(76, 175, 80, 0.5),
-                0 10px 25px rgba(0, 0, 0, 0.15),
+                0 20px 40px rgba(76, 175, 80, 0.5),
+                0 8px 20px rgba(0, 0, 0, 0.15),
                 inset 0 2px 0 rgba(255, 255, 255, 0.4);
             background: 
                 linear-gradient(135deg, #66bb6a 0%, #4caf50 50%, #388e3c 100%),
@@ -438,7 +447,7 @@
         }
         
         .submit-button:active {
-            transform: translateY(-4px) scale(1.01);
+            transform: translateY(-2px) scale(1.005);
         }
         
         .submit-button:disabled {
@@ -448,129 +457,11 @@
             background: linear-gradient(135deg, #a5d6a7, #81c784);
         }
         
-        /* --- 平板 (橫向) 響應式設計調整 --- */
-        @media (min-width: 769px) and (max-width: 1200px) {
-            .login-container {
-                /* 增加平板橫向的最大寬度，讓內容更舒展 */
-                max-width: 900px; 
-                padding: 50px 40px;
-            }
-            
-            .login-header h1 {
-                font-size: 3.2rem;
-            }
-
-            .form-row {
-                /* 確保在平板橫向時，表單欄位保持兩欄佈局 */
-                flex-direction: row;
-                gap: 30px;
-            }
-            
-            .form-group {
-                /* 強制每個欄位佔一半寬度 */
-                flex: 1 1 calc(50% - 15px); /* 50% 寬度減去一半的 gap */
-                min-width: unset; /* 移除最小寬度限制 */
-            }
-
-            .form-group.full-width {
-                width: 100%;
-                flex: none;
-            }
-
-            .form-input,
-            .form-select {
-                font-size: 1.4rem;
-                padding: 24px 20px;
-            }
-
-            .submit-button {
-                font-size: 1.8rem;
-                padding: 26px;
-            }
-        }
-        
-        /* --- 平板 (縱向) / 大手機 響應式設計 --- */
-        @media (max-width: 768px) {
-            .main-container {
-                padding: 15px;
-            }
-            
-            .login-container {
-                max-width: 95%; /* 讓它在大手機上也能稍微寬一點 */
-                padding: 40px 30px;
-                border-radius: 30px;
-            }
-            
-            .form-row {
-                flex-direction: column; /* 變回單欄垂直排列 */
-                gap: 20px;
-            }
-            
-            .form-group {
-                min-width: 100%;
-            }
-            
-            .login-header h1 {
-                font-size: 2.5rem;
-            }
-            
-            .subtitle {
-                font-size: 1.4rem;
-            }
-            
-            .form-label {
-                font-size: 1.4rem;
-            }
-            
-            .form-input,
-            .form-select {
-                font-size: 1.2rem;
-                padding: 20px 16px;
-            }
-            
-            .submit-button {
-                font-size: 1.6rem;
-                padding: 24px;
-            }
-            
-            .logo-ring {
-                width: 100px;
-                height: 100px;
-            }
-            
-            .main-icon {
-                font-size: 3.5rem;
-            }
-        }
-        
-        /* 小手機響應式設計 */
-        @media (max-width: 480px) {
-            .login-container {
-                padding: 30px 20px;
-                margin: 10px;
-            }
-            
-            .login-header h1 {
-                font-size: 2rem;
-            }
-            
-            .form-input,
-            .form-select {
-                padding: 18px 14px;
-                font-size: 1.1rem;
-            }
-            
-            .submit-button {
-                font-size: 1.4rem;
-                padding: 20px;
-            }
-        }
-        
         /* 錯誤提示樣式 */
         .error-message {
             color: #d32f2f;
-            font-size: 1.2rem;
-            margin-top: 10px;
+            font-size: 1rem;
+            margin-top: 8px;
             display: none;
             font-weight: 600;
             text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
@@ -579,23 +470,23 @@
         
         @keyframes errorShake {
             0%, 100% { transform: translateX(0); }
-            25% { transform: translateX(-8px); }
-            75% { transform: translateX(8px); }
+            25% { transform: translateX(-6px); }
+            75% { transform: translateX(6px); }
         }
         
         .form-input.error,
         .form-select.error {
             border-color: #f44336;
             box-shadow: 
-                0 0 0 5px rgba(244, 67, 54, 0.2),
-                inset 3px 3px 10px rgba(244, 67, 54, 0.1);
+                0 0 0 4px rgba(244, 67, 54, 0.2),
+                inset 2px 2px 8px rgba(244, 67, 54, 0.1);
             animation: inputShake 0.6s ease-in-out;
         }
         
         @keyframes inputShake {
             0%, 100% { transform: translateX(0) scale(1); }
-            25% { transform: translateX(-10px) scale(1.02); }
-            75% { transform: translateX(10px) scale(1.02); }
+            25% { transform: translateX(-8px) scale(1.01); }
+            75% { transform: translateX(8px) scale(1.01); }
         }
         
         /* 成功提示動畫 */
@@ -606,8 +497,8 @@
         @keyframes successPulse {
             0% { transform: scale(1); }
             50% { 
-                transform: scale(1.05); 
-                box-shadow: 0 0 0 8px rgba(76, 175, 80, 0.3);
+                transform: scale(1.03); 
+                box-shadow: 0 0 0 6px rgba(76, 175, 80, 0.3);
             }
             100% { transform: scale(1); }
         }
@@ -615,17 +506,116 @@
         /* Loading 動畫 */
         .loading-spinner {
             display: inline-block;
-            width: 20px;
-            height: 20px;
-            border: 3px solid rgba(255, 255, 255, 0.3);
+            width: 18px;
+            height: 18px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
             border-radius: 50%;
             border-top-color: #fff;
             animation: spin 1s ease-in-out infinite;
-            margin-left: 10px;
+            margin-left: 8px;
         }
         
         @keyframes spin {
             to { transform: rotate(360deg); }
+        }
+        
+        /* 平板縱向調整 */
+        @media (max-width: 1024px) and (orientation: portrait) {
+            .login-container {
+                max-width: 600px;
+                padding: 40px 35px;
+            }
+            
+            .form-grid {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+            
+            .form-group.full-width {
+                grid-column: span 1;
+            }
+            
+            .login-header h1 {
+                font-size: 2.5rem;
+            }
+        }
+        
+        /* 手機響應式設計 */
+        @media (max-width: 768px) {
+            .main-container {
+                padding: 15px;
+            }
+            
+            .login-container {
+                max-width: 95%;
+                padding: 30px 25px;
+                border-radius: 25px;
+                min-height: auto;
+            }
+            
+            .form-grid {
+                grid-template-columns: 1fr;
+                gap: 18px;
+            }
+            
+            .form-group.full-width {
+                grid-column: span 1;
+            }
+            
+            .login-header h1 {
+                font-size: 2.2rem;
+            }
+            
+            .subtitle {
+                font-size: 1.2rem;
+            }
+            
+            .form-label {
+                font-size: 1.3rem;
+                padding-left: 30px;
+            }
+            
+            .form-input,
+            .form-select {
+                font-size: 1.1rem;
+                padding: 16px 14px;
+            }
+            
+            .submit-button {
+                font-size: 1.4rem;
+                padding: 18px;
+            }
+            
+            .logo-ring {
+                width: 70px;
+                height: 70px;
+            }
+            
+            .main-icon {
+                font-size: 2.5rem;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .login-container {
+                padding: 25px 20px;
+                margin: 10px;
+            }
+            
+            .login-header h1 {
+                font-size: 1.9rem;
+            }
+            
+            .form-input,
+            .form-select {
+                padding: 14px 12px;
+                font-size: 1rem;
+            }
+            
+            .submit-button {
+                font-size: 1.3rem;
+                padding: 16px;
+            }
         }
     </style>
 </head>
@@ -655,7 +645,7 @@
             
             <div class="form-container">
                 <form id="loginForm" novalidate>
-                    <div class="form-row">
+                    <div class="form-grid">
                         <div class="form-group">
                             <label for="nickname" class="form-label" data-icon="👤">您的稱呼</label>
                             <input type="text" 
@@ -672,16 +662,14 @@
                             <label for="age" class="form-label" data-icon="🎂">年齡</label>
                             <select id="age" name="age" class="form-select" required>
                                 <option value="" disabled selected>請選擇您的年齡範圍</option>
-                                <option value="65-70歲">65-70歲 </option>
-                                <option value="71-75歲">71-75歲 </option>
-                                <option value="76-80歲">76-80歲 </option>
-                                <option value="81歲以上">81歲以上 </option>
+                                <option value="65-70歲">65-70歲</option>
+                                <option value="71-75歲">71-75歲</option>
+                                <option value="76-80歲">76-80歲</option>
+                                <option value="81歲以上">81歲以上</option>
                             </select>
                             <div class="error-message" id="ageError">請選擇年齡範圍</div>
                         </div>
-                    </div>
-                    
-                    <div class="form-row">
+                        
                         <div class="form-group">
                             <label for="gender" class="form-label" data-icon="👫">性別</label>
                             <select id="gender" name="gender" class="form-select" required>
@@ -697,22 +685,20 @@
                             <label for="hobby" class="form-label" data-icon="🎯">平時喜歡的活動</label>
                             <select id="hobby" name="hobby" class="form-select" required>
                                 <option value="" disabled selected>請選擇您喜歡的活動</option>
-                                <option value="散步運動">🚶‍♀️ 散步運動 </option>
-                                <option value="下棋益智">♟️ 下棋益智 </option>
-                                <option value="品茶聊天">🍵 品茶聊天 </option>
+                                <option value="散步運動">🚶‍♀️ 散步運動</option>
+                                <option value="下棋益智">♟️ 下棋益智</option>
+                                <option value="品茶聊天">🍵 品茶聊天</option>
                                 <option value="看電視電影">📺 影視娛樂</option>
-                                <option value="唱歌娛樂">🎤 歌唱娛樂 </option>
-                                <option value="園藝種植">🌱 園藝種植 </option>
+                                <option value="唱歌娛樂">🎤 歌唱娛樂</option>
+                                <option value="園藝種植">🌱 園藝種植</option>
                                 <option value="閱讀書報">📖 閱讀書報</option>
-                                <option value="烹飪美食">👩‍🍳 烹飪美食 </option>
-                                <option value="書法繪畫">🎨 書法繪畫 </option>
-                                <option value="其他活動">✨ 其他活動 </option>
+                                <option value="烹飪美食">👩‍🍳 烹飪美食</option>
+                                <option value="書法繪畫">🎨 書法繪畫</option>
+                                <option value="其他活動">✨ 其他活動</option>
                             </select>
                             <div class="error-message" id="hobbyError">請選擇您喜歡的活動</div>
                         </div>
-                    </div>
-                    
-                    <div class="form-row">
+                        
                         <div class="form-group full-width">
                             <input type="text" 
                                    id="otherHobby" 
@@ -723,9 +709,8 @@
                             <div class="error-message" id="otherHobbyError">請輸入您喜歡的其他活動</div>
                         </div>
                     </div>
-                    
-                    
                 </form>
+                
                 <button class="submit-button" id="submitBtn">
                     開始遊戲
                 </button>
@@ -736,16 +721,16 @@
     <script>
         // DOM 元素
         const form = document.getElementById('loginForm');
-        const nicknameInput = document.getElementById('nickname'); // 新增
-        const ageSelect = document.getElementById('age'); // 新增
-        const genderSelect = document.getElementById('gender'); // 新增
+        const nicknameInput = document.getElementById('nickname');
+        const ageSelect = document.getElementById('age');
+        const genderSelect = document.getElementById('gender');
         const hobbySelect = document.getElementById('hobby');
         const otherHobbyInput = document.getElementById('otherHobby');
         const submitBtn = document.getElementById('submitBtn');
 
         // 登入邏輯
         submitBtn.addEventListener('click', function(event) {
-            event.preventDefault(); // 阻止表單預設提交行為
+            event.preventDefault();
             if (validateForm()) {
                 // 顯示 Loading 效果
                 submitBtn.innerHTML = '載入中... <span class="loading-spinner"></span>';
@@ -767,8 +752,7 @@
                 setTimeout(() => {
                     submitBtn.classList.add('success-animation');
                     submitBtn.innerHTML = '✅ 準備進入遊戲';
-                    // 跳轉到遊戲主頁 (確保路徑正確)
-                    // 注意：您原本的程式碼中這裡的路徑是 'changecardhead.html'，這裡修正為相對路徑。
+                    // 跳轉到遊戲主頁
                     window.location.href = 'changecard/changecardhead.html'; 
                 }, 800);
             }
@@ -781,7 +765,6 @@
             if (this.value === '其他活動') {
                 otherInput.classList.add('show');
                 otherHobbyInput.required = true;
-                // 確保驗證邏輯會檢查這個欄位
                 otherHobbyInput.setAttribute('data-validate', 'required'); 
                 setTimeout(() => otherHobbyInput.focus(), 300);
             } else {
@@ -812,7 +795,6 @@
             if (field.tagName === 'SELECT' && field.value === '') {
                 valid = false;
             }
-
 
             if (!valid) {
                 field.classList.add('error');
