@@ -109,7 +109,8 @@
                 inset 0 -2px 0 rgba(0, 0, 0, 0.05);
             padding: 60px 50px;
             width: 100%;
-            max-width: 900px;
+            /* 調整：增加最大寬度以適應橫向平板 */
+            max-width: 1000px; 
             animation: containerEntry 1.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             position: relative;
             overflow: hidden;
@@ -255,7 +256,7 @@
             display: flex;
             gap: 30px;
             margin-bottom: 35px;
-            flex-wrap: wrap;
+            flex-wrap: wrap; /* 允許換行以處理不同寬度 */
         }
         
         .form-group {
@@ -447,45 +448,61 @@
             background: linear-gradient(135deg, #a5d6a7, #81c784);
         }
         
-        /* 平板響應式設計 */
-        @media (max-width: 1024px) {
+        /* --- 平板 (橫向) 響應式設計調整 --- */
+        @media (min-width: 769px) and (max-width: 1200px) {
             .login-container {
-                max-width: 800px;
+                /* 增加平板橫向的最大寬度，讓內容更舒展 */
+                max-width: 900px; 
                 padding: 50px 40px;
             }
             
+            .login-header h1 {
+                font-size: 3.2rem;
+            }
+
             .form-row {
-                gap: 25px;
+                /* 確保在平板橫向時，表單欄位保持兩欄佈局 */
+                flex-direction: row;
+                gap: 30px;
             }
             
             .form-group {
-                min-width: 250px;
+                /* 強制每個欄位佔一半寬度 */
+                flex: 1 1 calc(50% - 15px); /* 50% 寬度減去一半的 gap */
+                min-width: unset; /* 移除最小寬度限制 */
             }
-            
-            .login-header h1 {
-                font-size: 3rem;
+
+            .form-group.full-width {
+                width: 100%;
+                flex: none;
             }
-            
+
             .form-input,
             .form-select {
-                font-size: 1.3rem;
-                padding: 22px 18px;
+                font-size: 1.4rem;
+                padding: 24px 20px;
+            }
+
+            .submit-button {
+                font-size: 1.8rem;
+                padding: 26px;
             }
         }
         
-        /* 手機響應式設計 */
+        /* --- 平板 (縱向) / 大手機 響應式設計 --- */
         @media (max-width: 768px) {
             .main-container {
                 padding: 15px;
             }
             
             .login-container {
+                max-width: 95%; /* 讓它在大手機上也能稍微寬一點 */
                 padding: 40px 30px;
                 border-radius: 30px;
             }
             
             .form-row {
-                flex-direction: column;
+                flex-direction: column; /* 變回單欄垂直排列 */
                 gap: 20px;
             }
             
@@ -634,7 +651,6 @@
                 </div>
                 <h1>樂齡互動遊戲</h1>
                 <p class="subtitle">專為銀髮族設計的智能體感系統</p>
-                <p class="welcome-message">歡迎加入我們的遊戲世界，讓我們一起享受科技帶來的樂趣！</p>
             </div>
             
             <div class="form-container">
@@ -710,9 +726,9 @@
                     
                     
                 </form>
-                <button class="submit-button" id="submitBtn" onclick="location.href='changecard/changecardhead.html'">
-                        🎮 開始遊戲
-                    </button>
+                <button class="submit-button" id="submitBtn">
+                    開始遊戲
+                </button>
             </div>
         </div>
     </div>
@@ -720,40 +736,83 @@
     <script>
         // DOM 元素
         const form = document.getElementById('loginForm');
+        const nicknameInput = document.getElementById('nickname'); // 新增
+        const ageSelect = document.getElementById('age'); // 新增
+        const genderSelect = document.getElementById('gender'); // 新增
         const hobbySelect = document.getElementById('hobby');
         const otherHobbyInput = document.getElementById('otherHobby');
         const submitBtn = document.getElementById('submitBtn');
+
+        // 登入邏輯
         submitBtn.addEventListener('click', function(event) {
-            window.location.href = 'changecardhead.html';
+            event.preventDefault(); // 阻止表單預設提交行為
+            if (validateForm()) {
+                // 顯示 Loading 效果
+                submitBtn.innerHTML = '載入中... <span class="loading-spinner"></span>';
+                submitBtn.disabled = true;
+
+                // 儲存數據到 localStorage
+                localStorage.setItem('nickname', nicknameInput.value.trim());
+                localStorage.setItem('age', ageSelect.value);
+                localStorage.setItem('gender', genderSelect.value);
+                
+                // 根據是否選擇其他活動，儲存不同的值
+                if (hobbySelect.value === '其他活動' && otherHobbyInput.value.trim() !== '') {
+                    localStorage.setItem('hobby', otherHobbyInput.value.trim());
+                } else {
+                    localStorage.setItem('hobby', hobbySelect.value);
+                }
+
+                // 模擬延遲或動畫後跳轉
+                setTimeout(() => {
+                    submitBtn.classList.add('success-animation');
+                    submitBtn.innerHTML = '✅ 準備進入遊戲';
+                    // 跳轉到遊戲主頁 (確保路徑正確)
+                    // 注意：您原本的程式碼中這裡的路徑是 'changecardhead.html'，這裡修正為相對路徑。
+                    window.location.href = 'changecard/changecardhead.html'; 
+                }, 800);
+            }
         });
+
         // 顯示/隱藏其他嗜好輸入框
         hobbySelect.addEventListener('change', function() {
             const otherInput = document.querySelector('.other-input');
-            const otherError = document.getElementById('otherHobbyError');
             
             if (this.value === '其他活動') {
                 otherInput.classList.add('show');
                 otherHobbyInput.required = true;
+                // 確保驗證邏輯會檢查這個欄位
+                otherHobbyInput.setAttribute('data-validate', 'required'); 
                 setTimeout(() => otherHobbyInput.focus(), 300);
             } else {
                 otherInput.classList.remove('show');
                 otherHobbyInput.required = false;
+                otherHobbyInput.removeAttribute('data-validate');
                 otherHobbyInput.value = '';
                 hideError('otherHobby');
             }
         });
-        
-        // 表單驗證函數
-        function validateField(fieldId) {
-            const field = document.getElementById(fieldId);
+
+        // 表單驗證單個欄位
+        function validateField(field) {
+            const fieldId = field.id;
             const error = document.getElementById(fieldId + 'Error');
             let valid = true;
 
-            if (field.type === 'text') {
+            if (field.type === 'text' || field.tagName === 'SELECT') {
                 valid = field.value.trim() !== '';
-            } else if (field.tagName === 'SELECT') {
-                valid = field.value !== '';
             }
+
+            // 特殊處理其他活動欄位
+            if (fieldId === 'otherHobby' && hobbySelect.value !== '其他活動') {
+                valid = true; // 如果沒選「其他活動」，則此欄位不需驗證
+            }
+            
+            // 如果是 SELECT 標籤，要確保不是預設的 disabled 狀態
+            if (field.tagName === 'SELECT' && field.value === '') {
+                valid = false;
+            }
+
 
             if (!valid) {
                 field.classList.add('error');
@@ -764,3 +823,65 @@
             }
             return valid;
         }
+
+        // 隱藏錯誤訊息
+        function hideError(fieldId) {
+            const field = document.getElementById(fieldId);
+            const error = document.getElementById(fieldId + 'Error');
+            field.classList.remove('error');
+            error.style.display = 'none';
+        }
+
+        // 監聽所有輸入事件，即時清除錯誤提示
+        const fields = [nicknameInput, ageSelect, genderSelect, hobbySelect, otherHobbyInput];
+        fields.forEach(field => {
+            field.addEventListener('input', () => {
+                validateField(field);
+            });
+            field.addEventListener('change', () => {
+                validateField(field);
+            });
+        });
+
+        // 表單總體驗證
+        function validateForm() {
+            let formValid = true;
+            // 檢查所有主要欄位
+            if (!validateField(nicknameInput)) formValid = false;
+            if (!validateField(ageSelect)) formValid = false;
+            if (!validateField(genderSelect)) formValid = false;
+            if (!validateField(hobbySelect)) formValid = false;
+
+            // 檢查其他活動欄位 (如果被顯示)
+            if (hobbySelect.value === '其他活動') {
+                if (!validateField(otherHobbyInput)) formValid = false;
+            }
+            
+            if (!formValid) {
+                // 滾動到第一個錯誤的欄位
+                const firstError = document.querySelector('.form-input.error, .form-select.error');
+                if (firstError) {
+                    firstError.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }
+            }
+
+            return formValid;
+        }
+
+        // 檢查 localStorage 中是否有數據，如果有，則填入並跳轉
+        function checkLoginState() {
+            const storedNickname = localStorage.getItem('nickname');
+            if (storedNickname) {
+                // 如果已經有 nickname，自動填入並顯示歡迎訊息
+                nicknameInput.value = storedNickname;
+                document.querySelector('.subtitle').textContent = `歡迎回來，${storedNickname}！請確認資訊或直接開始。`;
+                
+                // 設置按鈕的點擊事件為直接跳轉，並模擬點擊
+                submitBtn.textContent = '🚀 繼續遊戲';
+            }
+        }
+        
+        window.onload = checkLoginState;
+    </script>
+</body>
+</html>
