@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>天燈點擊遊戲 - 點擊挑戰</title>
+    <title>天燈練習版</title>
     <style>
         * {
             margin: 0;
@@ -11,21 +11,68 @@
             box-sizing: border-box;
             touch-action: manipulation;
         }
-
         body {
-            font-family: 'Arial', sans-serif;
+            font-family: 'Microsoft JhengHei', 'Noto Sans TC', sans-serif;
+            /* 暗色星空漸層：深藍、藍紫、紫紅 */
             background: linear-gradient(
-                180deg,
-                #f7b267 0%,   /* 柔和的橘黃，地平線 */
-                #f4845f 40%,  /* 淡橘紅，黃昏 */
-                #2c3e50 100%  /* 深藍，夜空 */
+                135deg, 
+                #1a1a2e 0%, 
+                #16213e 25%, 
+                #0f3460 50%, 
+                #533483 75%, 
+                #e94057 100%
             );
+            background-attachment: fixed;
             overflow: hidden;
             height: 100vh;
             user-select: none;
             position: relative;
         }
+        /* --- 星空粒子效果 --- */
 
+ .floating-particles {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        pointer-events: none;
+        z-index: 1;
+    }
+
+    .particle-bg {
+        position: absolute;
+        width: 3px;
+        height: 3px;
+        border-radius: 50%;
+        background: radial-gradient(circle, rgba(255, 255, 255, 0.8), rgba(255, 255, 255, 0.3));
+        box-shadow: 0 0 5px rgba(255, 255, 255, 0.3);
+        /* 修正點：結合 float (上升) 和 twinkle (閃爍) 動畫 */
+        animation: 
+            float 15s ease-in-out infinite,
+            twinkle 2s ease-in-out infinite alternate; 
+        /* 移除 opacity: 0; 讓粒子在開始時就可見 */
+    }
+
+    /* 粒子動畫：從底部升起並消逝 */
+    @keyframes float {
+        /* 修正點：調整 0% 的 opacity 讓星星在畫面上可以閃爍出現 */
+        0% { transform: translateY(100vh) scale(0.5); opacity: 0.2; }
+        50% { transform: translateY(50vh) scale(1); opacity: 0.8; }
+        100% { transform: translateY(-20vh) scale(0.5); opacity: 0; }
+    }
+    
+    /* 新增的閃爍動畫 */
+    @keyframes twinkle {
+        0%, 100% { 
+            opacity: 0.8; 
+            transform: scale(1);
+        }
+        50% { 
+            opacity: 0.3; /* 降低透明度模擬閃爍 */
+            transform: scale(0.5); /* 縮小模擬亮度降低 */
+        }
+    }
         #gameCanvas {
             display: block;
             width: 100vw;
@@ -257,6 +304,19 @@
     </style>
 </head>
 <body>
+    <div class="floating-particles">
+        <div class="particle-bg" style="top: 10%; left: 20%; animation-delay: 1s; animation-duration: 12s;"></div>
+        <div class="particle-bg" style="top: 50%; left: 80%; animation-delay: 3s; animation-duration: 18s;"></div>
+        <div class="particle-bg" style="top: 30%; left: 5%; animation-delay: 5s; animation-duration: 14s;"></div>
+        <div class="particle-bg" style="top: 70%; left: 45%; animation-delay: 7s; animation-duration: 16s;"></div>
+        <div class="particle-bg" style="top: 5%; left: 60%; animation-delay: 9s; animation-duration: 20s;"></div>
+        <div class="particle-bg" style="top: 85%; left: 15%; animation-delay: 2s; animation-duration: 13s;"></div>
+        <div class="particle-bg" style="top: 40%; left: 95%; animation-delay: 4s; animation-duration: 17s;"></div>
+        <div class="particle-bg" style="top: 20%; left: 35%; animation-delay: 6s; animation-duration: 15s;"></div>
+        <div class="particle-bg" style="top: 65%; left: 70%; animation-delay: 8s; animation-duration: 19s;"></div>
+        <div class="particle-bg" style="top: 90%; left: 55%; animation-delay: 10s; animation-duration: 11s;"></div>
+    </div>
+
     <canvas id="gameCanvas"></canvas>
     
     <div class="game-ui">
@@ -575,7 +635,7 @@
         showGameOverScreen() {
             localStorage.setItem("score",this.score);
             localStorage.setItem("count",this.hitLanterns);
-            window.location.href = "gameover.html";
+            window.location.href = "gameover1.html";
         }
     }
 
