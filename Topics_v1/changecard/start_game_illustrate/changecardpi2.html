@@ -5,70 +5,198 @@
     <title>圖片說明2</title>
     <link rel="stylesheet" href="static/style7.css"> <!-- 引入CSS -->
 </head>
-<style>
-.user-info {
-  position: fixed;
-  top: 20px;
-  right: 30px;
-  font-size: 28px; /* 與 style8 相同大小 */
-  color: #333;
-  display: flex;
-  gap: 15px;
-  align-items: center;
-  font-family: "華康兒風體W3", "Microsoft JhengHei", sans-serif;
-  z-index: 1000;
+  <style>
+    /* ----------- 背景設定 ----------- */
+    body {
+      font-family: "Microsoft JhengHei", "Noto Sans TC", sans-serif;
+      background: 
+        radial-gradient(circle at 20% 20%, rgba(76, 175, 80, 0.3) 0%, transparent 50%),
+        radial-gradient(circle at 80% 80%, rgba(129, 199, 132, 0.4) 0%, transparent 50%),
+        radial-gradient(circle at 40% 60%, rgba(165, 214, 167, 0.3) 0%, transparent 50%),
+        linear-gradient(135deg, #e8f5e8 0%, #c8e6c9 25%, #a5d6a7 50%, #81c784 75%, #66bb6a 100%);
+      background-size: 800px 800px, 600px 600px, 400px 400px, 100% 100%;
+      background-attachment: fixed;
+      min-height: 100vh;
+      margin: 0;
+      padding: 0;
+      position: relative;
+      overflow-x: hidden;
+    }
+
+    /* ----------- 漂浮粒子 ----------- */
+    .floating-particles { position: fixed; top:0; left:0; width:100%; height:100%; pointer-events:none; z-index:1; }
+    .particle { position:absolute; width:8px; height:8px; border-radius:50%; background: radial-gradient(circle, rgba(76,175,80,0.8), rgba(129,199,132,0.4)); animation: float 8s ease-in-out infinite;}
+    .particle:nth-child(1){ left:10%; animation-delay:0s;}
+    .particle:nth-child(2){ left:25%; animation-delay:1s;}
+    .particle:nth-child(3){ left:40%; animation-delay:2s;}
+    .particle:nth-child(4){ left:55%; animation-delay:3s;}
+    .particle:nth-child(5){ left:70%; animation-delay:4s;}
+    .particle:nth-child(6){ left:85%; animation-delay:5s;}
+    @keyframes float {
+      0%,100% { transform: translateY(100vh) scale(0); opacity:0; }
+      10% { transform: translateY(90vh) scale(1); opacity:1; }
+      90% { transform: translateY(-10vh) scale(1); opacity:1; }
+      100% { transform: translateY(-20vh) scale(0); opacity:0; }
+    }
+
+    /* ----------- 半透明卡片容器 ----------- */
+    .game-wrapper {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      position: relative;
+      z-index: 2;
+    }
+    .game-container {
+      background: linear-gradient(145deg, rgba(255,255,255,0.95), rgba(248,255,248,0.9));
+      backdrop-filter: blur(20px);
+      border-radius: 30px;
+      box-shadow: 0 20px 50px rgba(76,175,80,0.25), 0 10px 25px rgba(0,0,0,0.1);
+      padding: 40px 30px;
+      width: 90%;
+      max-width: 700px;
+      text-align: center;
+      position: relative;
+    }
+
+    /* ----------- 卡牌樣式 ----------- */
+    button { background:none; border:none; padding:0; margin:10px; cursor:pointer;}
+    button img { width:100px; height:100px; object-fit:contain; }
+    input[type="button"] { width:100px; height:100px; font-size:2rem; border-radius:15px; border:none; background:#f0f0f0; margin:10px; cursor:pointer; box-shadow:0 5px 10px rgba(0,0,0,0.1); }
+    input[type="button"]:hover, button:hover { transform: scale(1.05); transition: transform 0.2s; }
+
+    h2 { color:#2e7d32; font-weight:700; margin-bottom:20px; }
+
+    /* ----------- 配對失敗訊息 ----------- */
+    #error-msg {
+      color: red;
+      font-size: 1.3rem;
+      font-weight: bold;
+      margin-top: 20px;
+      text-align: center;
+      display: block; /* 永遠顯示 */
+    }
+
+    /* ----------- 箭頭美化 ----------- */
+   /* 箭頭美化 */
+.arrow-button {
+    position: fixed;   /* 固定定位 */
+    top: 50%;          /* 按鈕垂直置中 */
+           /* 距離視窗右邊 40px*/
+    z-index: 10;
 }
 
-.user-info button {
-  padding: 12px 20px;
-  background-color: #CECEFF;
-  border: none;
-  border-radius: 10px;
-  cursor: pointer;
-  font-weight: bold;
-  font-size: 24px; /* 與 style8 相同字體大小 */
-  transition: background-color 0.3s ease;
-  font-family: "華康兒風體W3", "Microsoft JhengHei", sans-serif;
-}
 
-.user-info button:hover {
-  background-color: #b2b2ff;
-}
-
-.arrow-left {
-  display: inline-block;
-  width: 20px;
-  height: 20px;
-  border-top: 4px solid black;
-  border-left: 4px solid black;
-  transform: rotate(-45deg);
-  margin: 20px;
-  cursor: pointer;
-}
 .arrow-right {
-  display: inline-block;
-  width: 20px;
-  height: 20px;
-  border-top: 4px solid black;
-  border-right: 4px solid black;
-  transform: rotate(45deg);  /* 旋轉方向改為正 45 度 */
-  margin: 20px;
-  cursor: pointer;
+    display: flex; /* 彈性布局 */
+    justify-content: center;  /* 水平置中*/
+    align-items: center; /* 垂直置中 */
+    width: 70px;
+    height: 70px;
+    border-radius: 50%;  /* 圓形按鈕 */
+    background: linear-gradient(135deg, #66bb6a, #43a047); /* 漸層 */
+    color: white; /* 箭頭顏色*/
+    font-size: 2.2rem; /* 箭頭大小 */
+    right: 40px;
+    box-shadow: 0 10px 20px rgba(76,175,80,0.4); /* 陰影效果 */
+    cursor: pointer; /* 滑鼠變手指 */
+    transition: all 0.3s ease; /* 滑鼠 hover 過渡動畫 */
 }
-button {
-  background: none;
+.arrow-left {
+    display: flex; /* 彈性布局 */
+    justify-content: center;  /* 水平置中*/
+    align-items: center; /* 垂直置中 */
+    width: 70px;
+    height: 70px;
+    border-radius: 50%;  /* 圓形按鈕 */
+    background: linear-gradient(135deg, #66bb6a, #43a047); /* 漸層 */
+    color: white; /* 箭頭顏色*/
+    font-size: 2.2rem; /* 箭頭大小 */
+    left: 40px;
+    box-shadow: 0 10px 20px rgba(76,175,80,0.4); /* 陰影效果 */
+    cursor: pointer; /* 滑鼠變手指 */
+    transition: all 0.3s ease; /* 滑鼠 hover 過渡動畫 */
+}
+
+/* ----------- 卡牌按鈕美化 ----------- */
+button, input[type="button"] {
+  background: linear-gradient(135deg, #66bb6a, #43a047);
   border: none;
-  padding: 0;
+  border-radius: 20px;
+  color: white;
+  font-size: 1.8rem;
+  font-weight: 600;
+  padding: 1rem 1.5rem;
   margin: 10px;
   cursor: pointer;
+  box-shadow: 0 6px 15px rgba(76,175,80,0.3);
+  transition: all 0.3s ease;
+  width: 120px;
+  height: 120px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 button img {
-  width: 100px;     /* 控制圖片大小 */
-  height: 100px;
+  width: 80px;
+  height: 80px;
   object-fit: contain;
 }
-</style>
+
+button:hover, input[type="button"]:hover {
+  transform: translateY(-5px) scale(1.05);
+  box-shadow: 0 12px 25px rgba(76,175,80,0.5);
+}
+
+/* ----------- 箭頭按鈕美化 ----------- */
+.arrow-left, .arrow-right {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 80px;
+  height: 80px;
+  border-radius: 25px;
+  background: linear-gradient(135deg, #43a047, #1b5e20);
+  color: white;
+  font-size: 2.5rem;
+  box-shadow: 0 8px 20px rgba(76,175,80,0.4);
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.arrow-left:hover, .arrow-right:hover {
+  transform: translateY(-3px) scale(1.1);
+  box-shadow: 0 12px 30px rgba(76,175,80,0.6);
+}
+
+/* ----------- 關閉 X 按鈕 ----------- */
+.arrow-button2 {
+  position: fixed;
+  top: 40px;
+  right: 40px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 60px;
+  height: 60px;
+  border-radius: 25px;
+  background: linear-gradient(135deg, #ef5350, #b71c1c);
+  color: white;
+  font-size: 2rem;
+  font-weight: bold;
+  box-shadow: 0 5px 15px rgba(239,83,80,0.5);
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.arrow-button2:hover {
+  transform: translateY(-3px) scale(1.1);
+  box-shadow: 0 10px 25px rgba(239,83,80,0.7);
+}
+
+  </style>
 <body>
     <h2>記憶翻牌</h2>
     <form>
