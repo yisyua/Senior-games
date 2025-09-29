@@ -257,6 +257,47 @@ h1::after {
     .grid-item {font-size:36px;}
     .button-group {grid-template-columns:1fr; gap:15px;}
     .btn {font-size:20px; padding:18px 25px;}
+    @media (min-width: 1025px) and (max-width: 1366px) {
+    .login-container {
+        /* 將最大寬度稍微縮小，避免在過寬的螢幕上拉得太開 */
+        max-width: 1000px;
+        padding: 50px 70px; /* 增加邊距讓內容更舒適 */
+        border-radius: 50px;
+        /* 確保內容不會頂到邊緣 */
+    }
+
+    .login-header h1 {
+        font-size: 3rem; /* 標題在橫向螢幕上可以更大氣 */
+    }
+
+    .subtitle {
+        font-size: 1.4rem;
+    }
+
+    .form-grid {
+        /* 在橫向平板上維持雙欄佈局，並調整欄間距 */
+        grid-template-columns: 1fr 1fr;
+        gap: 30px 50px;
+        margin-bottom: 40px;
+    }
+
+    .form-label {
+        font-size: 1.5rem; /* 標籤文字稍微放大，提高可讀性 */
+    }
+
+    .form-input,
+    .form-select {
+        padding: 20px 18px; /* 輸入框和選擇框加高 */
+        font-size: 1.3rem; /* 輸入文字稍微放大 */
+        border-radius: 20px;
+    }
+
+    .submit-button {
+        padding: 22px; /* 按鈕加高，更容易點擊 */
+        font-size: 1.8rem;
+        border-radius: 25px;
+    }
+}
 }
 </style>
 </head>
