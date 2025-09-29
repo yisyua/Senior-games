@@ -1,127 +1,379 @@
 <!DOCTYPE html>
 <html lang="zh-Hant">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>練習&測驗選擇</title>
-<style>
-/* --- 基礎重置與字體設定 --- */
-* { box-sizing:border-box; margin:0; padding:0; }
-body {
-    background: 
-        radial-gradient(circle at 20% 20%, rgba(76,175,80,0.3) 0%, transparent 50%),
-        radial-gradient(circle at 80% 80%, rgba(129,199,132,0.4) 0%, transparent 50%),
-        radial-gradient(circle at 40% 60%, rgba(165,214,167,0.3) 0%, transparent 50%),
-        linear-gradient(135deg, #e8f5e8 0%, #c8e6c9 25%, #a5d6a7 50%, #81c784 75%, #66bb6a 100%);
-    background-size: 800px 800px,600px 600px,400px 400px,100% 100%;
-    font-family:"Microsoft JhengHei","Noto Sans TC",sans-serif;
-    min-height:100vh; overflow-x:hidden; position:relative;
-}
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>練習&測驗選擇</title>
+    <style>
+        /* CSS Reset and Base Styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
-/* --- 漂浮粒子 --- */
-.floating-particles { position:fixed; top:0; left:0; width:100%; height:100%; pointer-events:none; z-index:1; }
-.particle { position:absolute; width:6px; height:6px; border-radius:50%; background: radial-gradient(circle, rgba(76,175,80,0.6), rgba(129,199,132,0.3)); animation: float 12s ease-in-out infinite; }
-.particle:nth-child(1){ left:10%; animation-delay:0s; }
-.particle:nth-child(2){ left:80%; animation-delay:5s; }
-@keyframes float {
-    0%,100%{ transform:translateY(100vh) rotate(0deg) scale(0); opacity:0; }
-    10%{ opacity:0.7; transform:translateY(90vh) rotate(36deg) scale(1); }
-    90%{ opacity:0.7; transform:translateY(-10vh) rotate(324deg) scale(1); }
-    100%{ opacity:0; transform:translateY(-20vh) rotate(360deg) scale(0); }
-}
+        /* ----------- Body & Background Styles (與規則頁面相同) ----------- */
+        body {
+            font-family: 'Microsoft JhengHei', 'PingFang TC', sans-serif;
+            /* 靜態深灰漸層背景 */
+            background: linear-gradient(135deg, #2d3436 0%, #636e72 100%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+            position: relative;
+            overflow: hidden; 
+        }
 
-/* --- 返回按鈕 (左側中間) --- */
-.back-button {
-    position: fixed;
-    top: 50%;
-    left: 20px;
-    transform: translateY(-50%);
-    z-index:10;
-}
-.arrow-left {
-    display:flex; align-items:center; justify-content:center;
-    width:70px; height:70px; /* 放大按鈕 */
-    background:rgba(255,255,255,0.9);
-    backdrop-filter:blur(10px); border-radius:50%; cursor:pointer;
-    box-shadow:0 8px 25px rgba(76,175,80,0.2); text-decoration:none;
-}
-.arrow-left::before {
-    content:'';
-    width:18px; height:18px; /* 放大箭頭 */
-    border-top:4px solid #2e7d32; border-left:4px solid #2e7d32;
-    transform:rotate(-45deg);
-}
-.arrow-left:hover { background:rgba(76,175,80,0.1); transform:translateX(-3px); box-shadow:0 10px 30px rgba(76,175,80,0.3); }
+        /* ----------- 幾何動畫背景樣式 (與規則頁面相同) ----------- */
+        .geometric-bg {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            opacity: 0.1; 
+            pointer-events: none; 
+            z-index: 0;
+        }
 
-/* --- 主內容 --- */
-.main-container { display:flex; flex-direction:column; align-items:center; min-height:100vh; padding:120px 20px 40px; position:relative; z-index:2; }
-.game-header { text-align:center; margin-bottom:50px; animation:slideDown 0.8s ease-out; }
-@keyframes slideDown { from{opacity:0; transform:translateY(-50px);} to{opacity:1; transform:translateY(0);} }
-.main-title { font-size:3.5rem; font-weight:800; color:#333; margin-bottom:15px; font-family:'Noto Serif TC', serif; }
+        /* 旋轉圓圈 */
+        .circle {
+            position: absolute;
+            border: 2px solid #dfe6e9; 
+            border-radius: 50%;
+            animation: rotate 20s linear infinite;
+        }
 
-/* --- 白色半透明卡片 --- */
-.content-card {
-    background: linear-gradient(145deg, rgba(255,255,255,0.95), rgba(248,255,248,0.9));
-    backdrop-filter: blur(20px); border-radius:30px;
-    box-shadow:0 25px 60px rgba(76,175,80,0.2),0 15px 35px rgba(0,0,0,0.1), inset 0 2px 0 rgba(255,255,255,0.8);
-    padding:50px; max-width:800px; width:90%;
-    animation:fadeInUp 1s ease-out 0.3s both;
-}
-@keyframes fadeInUp { from{opacity:0; transform:translateY(30px);} to{opacity:1; transform:translateY(0);} }
+        @keyframes rotate {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
 
-/* --- 選項卡片 --- */
-.option-grid { display:flex; justify-content:center; align-items:center; gap:40px; padding:20px 0; }
-.selection-option {
-    display:flex; flex-direction:column; align-items:center; justify-content:center;
-    width:250px; height:250px; border-radius:30px; padding:30px; text-align:center;
-    cursor:pointer; text-decoration:none; color:inherit;
-    transition: all 0.4s cubic-bezier(0.175,0.885,0.32,1.275); box-shadow:0 10px 30px rgba(0,0,0,0.05);
-}
-.selection-option:hover { transform:translateY(-10px) scale(1.05); box-shadow:0 20px 50px rgba(76,175,80,0.2); }
-.selection-option h2 { font-size:2.5rem; font-weight:800; margin-bottom:10px; color:#333; font-family:'Noto Serif TC', serif; }
+        /* 漂浮粒子 */
+        .particle {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background: #b2bec3;
+            border-radius: 50%;
+            animation: float-particle 15s infinite;
+        }
 
-.green-option { background:linear-gradient(145deg,#f0fff0,#e6ffe6); border:3px solid rgba(76,175,80,0.2); }
-.yellow-option { background:linear-gradient(145deg,#fffcf0,#fff7e6); border:3px solid rgba(255,152,0,0.2); }
+        @keyframes float-particle {
+            0%, 100% { transform: translate(0, 0); opacity: 0.3; }
+            50% { transform: translate(100px, -100px); opacity: 0.8; }
+        }
+        
+        /* 標題底線擴展動畫 */
+        @keyframes line-expand {
+            0%,100%{width:100px;}
+            50%{width:200px;}
+        }
 
-@media(max-width:1024px){ .content-card{ max-width:600px; } }
-@media(max-width:768px){
-    .main-container{ padding:100px 15px 30px; }
-    .main-title{ font-size:2.5rem; }
-    .content-card{ padding:30px 20px; width:90%; }
-    .option-grid{ flex-direction:column; gap:25px; }
-    .selection-option{ width:100%; max-width:350px; height:180px; }
-    .selection-option h2{ font-size:2rem; }
-}
-</style>
+        /* ----------- 主內容卡片容器樣式 ----------- */
+        .main-card {
+            background: rgba(255, 255, 255, 0.95); /* 奶油白色半透明卡片 */
+            border-radius: 30px;
+            padding: 60px 40px; 
+            box-shadow: 
+                0 20px 60px rgba(0, 0, 0, 0.3),
+                0 0 0 1px rgba(255, 255, 255, 0.1);
+            position: relative;
+            z-index: 1;
+            max-width: 500px; /* 控制卡片總寬度 */
+            width: 90%; 
+            text-align: center;
+        }
+
+        /* 頁面標題 H1 樣式 */
+        .main-card h1 {
+            color: #2d3436;
+            font-size: 50px;
+            margin-bottom: 40px;
+            font-weight: 700;
+            letter-spacing: 5px; 
+            position: relative;
+            padding-bottom: 15px;
+        }
+
+        /* 頁面標題底線 */
+        .main-card h1::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100px; 
+            height: 4px;
+            background: linear-gradient(90deg, transparent, #636e72, transparent);
+            animation: line-expand 2s ease-in-out infinite; 
+        }
+
+        /* ----------- 練習/測驗按鈕容器及樣式 ----------- */
+        .button-container {
+            display: flex;
+            flex-direction: column; /* 垂直排列 */
+            gap: 25px;
+            margin-top: 30px;
+        }
+
+        .button {
+            padding: 20px 30px;
+            border-radius: 15px;
+            border: none;
+            font-size: 24px;
+            font-weight: 800;
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 8px 15px rgba(0,0,0,0.2);
+            line-height: 1.4;
+        }
+
+        /* 練習版按鈕 (藍色系) */
+        .button1 { /* 您原始文件中的 button1 樣式 */
+            background: linear-gradient(135deg, #6C6C6C	);
+        }
+        .button1:hover {
+            box-shadow: 0 10px 20px #D0D0D0;
+            transform: translateY(-3px);
+            background: linear-gradient(135deg, #ADADAD	);
+        }
+
+        /* 測驗版按鈕 (綠色系) */
+        .button2 { /* 您原始文件中的 button2 樣式 */
+            background: linear-gradient(135deg, #6C6C6C	);
+        }
+        .button2:hover {
+            box-shadow: 0 10px 20px #D0D0D0;
+            transform: translateY(-3px);
+            background: linear-gradient(135deg, #ADADAD	);
+        }
+        
+        /* ------------------- 導航按鈕樣式 (X) ------------------- */
+        /* 導航按鈕容器 */
+        .arrow-wrapper {
+            position: absolute;
+            top: 0; 
+            left: 0;
+            pointer-events: none; /* 確保不阻擋卡片點擊 */
+            z-index: 10;
+        }
+
+        /* 關閉按鈕 (X) 樣式 - 保持與規則頁面風格一致 */
+        .back-button {
+            position: absolute;
+            top: 40px; 
+            left: 40px;
+            background: rgba(255, 255, 255, 0.85); /* 奶油白色半透明 */
+            border: none;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            font-size: 20px;
+            font-weight: 400;
+            color: #2d3436; 
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            transition: all 0.3s ease;
+            user-select: none;
+            pointer-events: auto; /* 啟用點擊事件 */
+            transform: none;
+        }
+
+        .back-button:hover {
+            background: #636e72; 
+            color: white;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.4);
+            transform: scale(1.1); 
+        }
+
+        /* ------------------- 使用者資訊 (User Info) 樣式 ------------------- */
+        .user-info {
+             position: absolute;
+             top: 20px;
+             right: 30px;
+             font-size: 20px; 
+             color: #dfe6e9; /* 淺色文字，與深色背景匹配 */
+             display: flex;
+             gap: 15px; /* 加大間距 */
+             align-items: center;
+             z-index: 20; /* 確保在最上層 */
+             font-family: "華康兒風體W3", 'Microsoft JhengHei', sans-serif;
+        }
+
+        .user-info button {
+             padding: 8px 15px; 
+             background-color: #a29bfe; /* 藍紫色 */
+             color: white; 
+             border: none;
+             border-radius: 8px;
+             font-size: 16px; 
+             cursor: pointer;
+             font-weight: bold;
+             transition: background-color 0.3s ease, transform 0.1s ease;
+             font-family: "華康兒風體W3", 'Microsoft JhengHei', sans-serif;
+             box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        .user-info button:hover {
+             background-color: #897bff;
+             transform: translateY(-1px);
+        }
+
+        /* ------------------- 響應式調整 ------------------- */
+        @media (max-width: 600px) {
+            .main-card {
+                padding: 40px 20px;
+                width: 95%;
+            }
+            .main-card h1 {
+                font-size: 38px;
+                letter-spacing: 3px;
+                margin-bottom: 30px;
+            }
+            .button {
+                font-size: 20px;
+                padding: 15px 25px;
+            }
+            .back-button { 
+                top: 20px;
+                left: 20px;
+                width: 35px;
+                height: 35px;
+                font-size: 18px;
+            }
+             .user-info {
+                top: 10px;
+                right: 10px;
+                font-size: 16px;
+                gap: 10px;
+            }
+            .user-info button {
+                padding: 5px 10px;
+                font-size: 14px;
+            }
+        }
+    </style>
 </head>
 <body>
+    <div class="geometric-bg" id="geometric"></div>
 
-<!-- 浮動粒子 -->
-<div class="floating-particles">
-    <div class="particle"></div>
-    <div class="particle"></div>
-</div>
+   
 
-<!-- 返回箭頭 (左側中間) -->
-<div class="back-button">
-    <a class="arrow-left" href="./illustrate/illustrate_pi2.html"></a>
-</div>
-
-<!-- 主內容 -->
-<div class="main-container">
-    <div class="game-header">
-        <h1 class="main-title">版本選擇</h1>
+    <div class="arrow-wrapper">
+        <span class="back-button" onclick="location.href='checkcardstart.html'">X</span>
     </div>
-    <div class="content-card">
-        <div class="option-grid">
-            <a class="selection-option green-option" href="game/33.html">
-                <h2>練習版<br>4個數字</h2>
-            </a>
-            <a class="selection-option yellow-option" href="game/34.html">
-                <h2>測驗版<br>3種難度</h2>
-            </a>
+
+    <div class="main-card">
+        <header>
+            <h1>數字對對碰</h1>
+        </header>
+        <div class="button-container">
+            <button class="button button2" onclick="location.href='game/33.html';play()" id="play" name="練習">練習版<br>4個數字</button>
+            <button class="button button1" onclick="location.href='game/34.html';test()" id="test" name="測驗">測驗版<br>3種難度</button>
         </div>
     </div>
-</div>
+
+<script>
+    // ----------- 幾何背景動畫 JavaScript (與規則頁面相同) -----------
+    const geometricBg = document.getElementById('geometric');
+
+    // 圓圈資料 (固定位置，添加移動動畫)
+    const circlesData = [
+        { left: '5%', top: '10%', size: 250, duration: 20, delay: 0 },
+        { left: '80%', top: '15%', size: 300, duration: 25, delay: 3 },
+        { left: '20%', top: '70%', size: 220, duration: 22, delay: 2 },
+        { left: '70%', top: '60%', size: 280, duration: 18, delay: 1 },
+        { left: '40%', top: '40%', size: 260, duration: 24, delay: 4 },
+    ];
+
+    // 創建圓圈並添加浮動效果
+    circlesData.forEach((c, index) => {
+        const circle = document.createElement('div');
+        circle.className = 'circle';
+        circle.style.width = c.size + 'px';
+        circle.style.height = c.size + 'px';
+        circle.style.left = c.left;
+        circle.style.top = c.top;
+        circle.style.animationDuration = c.duration + 's';
+        circle.style.animationDelay = c.delay + 's';
+        geometricBg.appendChild(circle);
+
+        // 添加緩慢移動動畫
+        animateCircle(circle, index);
+    });
+
+    function animateCircle(circle, index) {
+        const moveTime = 8000 + (index * 1000);
+
+        function move() {
+            const currentLeft = parseFloat(circle.style.left);
+            const currentTop = parseFloat(circle.style.top);
+
+            const newLeft = currentLeft + (Math.random() - 0.5) * 5;
+            const newTop = currentTop + (Math.random() - 0.5) * 5;
+
+            circle.style.transition = `left ${moveTime}ms ease-in-out, top ${moveTime}ms ease-in-out`;
+            circle.style.left = Math.max(0, Math.min(95, newLeft)) + '%';
+            circle.style.top = Math.max(0, Math.min(95, newTop)) + '%';
+        }
+
+        setInterval(move, moveTime);
+    }
+
+    // 粒子資料 (固定位置)
+    const particlesData = [
+        { left: '10%', top: '20%', duration: 15, delay: 0 },
+        { left: '25%', top: '80%', duration: 18, delay: 1 },
+        { left: '60%', top: '30%', duration: 16, delay: 2 },
+        { left: '85%', top: '70%', duration: 20, delay: 3 },
+        { left: '40%', top: '50%', duration: 17, delay: 4 },
+        { left: '70%', top: '20%', duration: 19, delay: 2 },
+        { left: '15%', top: '60%', duration: 15, delay: 1 },
+        { left: '50%', top: '10%', duration: 16, delay: 0 },
+        { left: '30%', top: '35%', duration: 18, delay: 2 },
+        { left: '80%', top: '50%', duration: 20, delay: 3 },
+        { left: '60%', top: '80%', duration: 19, delay: 1 },
+        { left: '5%', top: '50%', duration: 17, delay: 0 },
+        { left: '90%', top: '10%', duration: 16, delay: 2 },
+        { left: '20%', top: '25%', duration: 18, delay: 1 },
+        { left: '45%', top: '70%', duration: 15, delay: 0 },
+        { left: '75%', top: '40%', duration: 16, delay: 3 },
+        { left: '10%', top: '80%', duration: 17, delay: 2 },
+        { left: '55%', top: '55%', duration: 19, delay: 1 },
+        { left: '35%', top: '15%', duration: 20, delay: 4 },
+        { left: '65%', top: '25%', duration: 18, delay: 2 },
+    ];
+
+    // 創建粒子
+    particlesData.forEach(p => {
+        const particle = document.createElement('div');
+        particle.className = 'particle';
+        particle.style.left = p.left;
+        particle.style.top = p.top;
+        particle.style.animationDuration = p.duration + 's';
+        particle.style.animationDelay = p.delay + 's';
+        geometricBg.appendChild(particle);
+    });
+
+ 
+
+    function test(){
+        const level = "測驗";
+        localStorage.setItem("test", level);
+    }
+
+    function play(){
+        const level = "練習";
+        localStorage.setItem("test", level);
+    }
+
+    
+ 
+</script> 
 </body>
 </html>
