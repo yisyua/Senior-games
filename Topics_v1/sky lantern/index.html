@@ -12,19 +12,66 @@
       touch-action: manipulation;
     }
 
+    /* 替換為暗色星空漸層 (來自您的第一個範例) */
     body {
-      font-family: 'Arial', sans-serif;
-      background: linear-gradient(
-        180deg,
-        #f7b267 0%,   /* 柔和的橘黃，地平線 */
-        #f4845f 40%,  /* 淡橘紅，黃昏 */
-        #2c3e50 100%  /* 深藍，夜空 */
-      );
-      overflow: hidden;
-      height: 100vh;
-      user-select: none;
-      position: relative;
+    font-family: 'Arial', sans-serif;
+    /* 暗色星空漸層：深藍、藍紫、紫紅 */
+    background: linear-gradient(
+        135deg,
+        #1a1a2e 0%,
+        #16213e 25%,
+        #0f3460 50%,
+        #533483 75%,
+        #e94057 100%
+    );
+    background-attachment: fixed;
+    overflow: hidden;
+    height: 100vh;
+    user-select: none;
+    position: relative;
+    touch-action: manipulation;
+}
+.floating-particles {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none; /* 確保粒子不會阻擋點擊事件 */
+    z-index: 1;
+}
+
+.particle-bg {
+    position: absolute;
+    width: 3px;
+    height: 3px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(255, 255, 255, 0.8), rgba(255, 255, 255, 0.3));
+    box-shadow: 0 0 5px rgba(255, 255, 255, 0.3);
+    /* 結合動畫：float (上升) 和 twinkle (閃爍) 動畫 */
+    animation:
+        float 15s ease-in-out infinite,
+        twinkle 2s ease-in-out infinite alternate;
+}
+
+/* 粒子動畫：從底部升起並消逝 (模擬天燈或流星) */
+@keyframes float {
+    0% { transform: translateY(100vh) scale(0.5); opacity: 0.2; }
+    50% { transform: translateY(50vh) scale(1); opacity: 0.8; }
+    100% { transform: translateY(-20vh) scale(0.5); opacity: 0; }
+}
+
+/* 新增的閃爍動畫 (解決您上次提出的「沒有閃」的問題) */
+@keyframes twinkle {
+    0%, 100% {
+        opacity: 0.8;
+        transform: scale(1);
     }
+    50% {
+        opacity: 0.3; /* 降低透明度模擬閃爍 */
+        transform: scale(0.5); /* 縮小模擬亮度降低 */
+    }
+}
 
     #gameCanvas {
       display: block;
@@ -300,6 +347,38 @@
   </style>
 </head>
 <body>
+    <div class="floating-particles">
+        <div class="particle-bg" style="top: 10%; left: 20%; animation-delay: 1s; animation-duration: 12s;"></div>
+        <div class="particle-bg" style="top: 50%; left: 80%; animation-delay: 3s; animation-duration: 18s;"></div>
+        <div class="particle-bg" style="top: 30%; left: 5%; animation-delay: 5s; animation-duration: 14s;"></div>
+        <div class="particle-bg" style="top: 70%; left: 45%; animation-delay: 7s; animation-duration: 16s;"></div>
+        <div class="particle-bg" style="top: 5%; left: 60%; animation-delay: 9s; animation-duration: 20s;"></div>
+        <div class="particle-bg" style="top: 85%; left: 15%; animation-delay: 2s; animation-duration: 13s;"></div>
+        <div class="particle-bg" style="top: 40%; left: 95%; animation-delay: 4s; animation-duration: 17s;"></div>
+        <div class="particle-bg" style="top: 20%; left: 35%; animation-delay: 6s; animation-duration: 15s;"></div>
+        <div class="particle-bg" style="top: 65%; left: 70%; animation-delay: 8s; animation-duration: 19s;"></div>
+        <div class="particle-bg" style="top: 90%; left: 55%; animation-delay: 10s; animation-duration: 11s;"></div>
+        <div class="particle-bg" style="top: 15%; left: 75%; animation-delay: 0.5s; animation-duration: 14s;"></div>
+        <div class="particle-bg" style="top: 45%; left: 25%; animation-delay: 2.5s; animation-duration: 17s;"></div>
+        <div class="particle-bg" style="top: 80%; left: 90%; animation-delay: 4.5s; animation-duration: 13s;"></div>
+        <div class="particle-bg" style="top: 25%; left: 50%; animation-delay: 6.5s; animation-duration: 19s;"></div>
+        <div class="particle-bg" style="top: 60%; left: 10%; animation-delay: 8.5s; animation-duration: 15s;"></div>
+        <div class="particle-bg" style="top: 35%; left: 85%; animation-delay: 1.5s; animation-duration: 16s;"></div>
+        <div class="particle-bg" style="top: 75%; left: 30%; animation-delay: 3.5s; animation-duration: 18s;"></div>
+        <div class="particle-bg" style="top: 55%; left: 65%; animation-delay: 5.5s; animation-duration: 12s;"></div>
+        <div class="particle-bg" style="top: 95%; left: 40%; animation-delay: 7.5s; animation-duration: 20s;"></div>
+        <div class="particle-bg" style="top: 12%; left: 92%; animation-delay: 9.5s; animation-duration: 14s;"></div>
+        <div class="particle-bg" style="top: 48%; left: 12%; animation-delay: 0.8s; animation-duration: 16s;"></div>
+        <div class="particle-bg" style="top: 78%; left: 58%; animation-delay: 2.8s; animation-duration: 15s;"></div>
+        <div class="particle-bg" style="top: 22%; left: 48%; animation-delay: 4.8s; animation-duration: 17s;"></div>
+        <div class="particle-bg" style="top: 68%; left: 88%; animation-delay: 6.8s; animation-duration: 13s;"></div>
+        <div class="particle-bg" style="top: 38%; left: 22%; animation-delay: 8.8s; animation-duration: 19s;"></div>
+        <div class="particle-bg" style="top: 88%; left: 78%; animation-delay: 1.2s; animation-duration: 14s;"></div>
+        <div class="particle-bg" style="top: 8%; left: 38%; animation-delay: 3.2s; animation-duration: 18s;"></div>
+        <div class="particle-bg" style="top: 52%; left: 52%; animation-delay: 5.2s; animation-duration: 16s;"></div>
+        <div class="particle-bg" style="top: 72%; left: 8%; animation-delay: 7.2s; animation-duration: 12s;"></div>
+        <div class="particle-bg" style="top: 32%; left: 68%; animation-delay: 9.2s; animation-duration: 20s;"></div>
+    </div>
   <canvas id="gameCanvas"></canvas>
   
   <div class="game-ui">
@@ -811,7 +890,6 @@ showGameOverScreen() {
           localStorage.setItem("missedLanterns",stats.missedLanterns);
           window.location.href = "gameover.html";
       } 
-
 
 } 
 
