@@ -2,8 +2,9 @@
 <html lang="zh-Hant">
 <head>
   <meta charset="UTF-8">
-  <title>記憶翻牌遊戲</title>
+  <title>圖片說明1</title>
   <link rel="stylesheet" href="static/style7.css">
+</head>
   <style>
     /* ----------- 背景設定 ----------- */
     body {
@@ -82,7 +83,7 @@
 .arrow-button {
     position: fixed;   /* 固定定位 */
     top: 50%;          /* 按鈕垂直置中 */
-           /* 距離視窗右邊 40px*/
+     right: 40px;       /* 距離視窗右邊 40px*/
     z-index: 10;
 }
 
@@ -97,7 +98,7 @@
     background: linear-gradient(135deg, #66bb6a, #43a047); /* 漸層 */
     color: white; /* 箭頭顏色*/
     font-size: 2.2rem; /* 箭頭大小 */
-    right: 40px;
+
     box-shadow: 0 10px 20px rgba(76,175,80,0.4); /* 陰影效果 */
     cursor: pointer; /* 滑鼠變手指 */
     transition: all 0.3s ease; /* 滑鼠 hover 過渡動畫 */
@@ -147,7 +148,7 @@
   </div>
 
   <!-- 左右箭頭 -->
-  <div class="arrow-button arrow-left" onclick="location.href='changecard_illustrate.html'"><</div>
-  <div class="arrow-button arrow-right" onclick="location.href='changecardpi2.html'">></div>
+  <div class="arrow-button arrow-left" onclick="location.href='changecard_illustrate.html'">&#9664;</div>
+  <div class="arrow-button arrow-right" onclick="location.href='changecardpi2.html'">&#9654;</div>
 </body>
 </html>
