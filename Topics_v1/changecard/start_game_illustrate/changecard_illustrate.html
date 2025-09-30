@@ -97,24 +97,24 @@ body {
 .arrow-button {
     position: fixed;   /* 固定定位 */
     top: 50%;          /* 按鈕垂直置中 */
-    right: 40px;       /* 距離視窗右邊 40px*/
     z-index: 10;
 }
 
-
+/* 右箭頭 */
 .arrow-right {
-    display: flex; /* 彈性布局 */
-    justify-content: center;  /* 水平置中*/
-    align-items: center; /* 垂直置中 */
+    display: flex;
+    justify-content: center;
+    align-items: center;
     width: 70px;
     height: 70px;
-    border-radius: 50%;  /* 圓形按鈕 */
-    background: linear-gradient(135deg, #66bb6a, #43a047); /* 漸層 */
-    color: white; /* 箭頭顏色*/
-    font-size: 2.2rem; /* 箭頭大小 */
-    box-shadow: 0 10px 20px rgba(76,175,80,0.4); /* 陰影效果 */
-    cursor: pointer; /* 滑鼠變手指 */
-    transition: all 0.3s ease; /* 滑鼠 hover 過渡動畫 */
+    border-radius: 50%;
+    background: linear-gradient(135deg, #66bb6a, #43a047);
+    color: white;
+    font-size: 2.2rem;
+    right: 40px; /* 右邊定位 */
+    box-shadow: 0 10px 20px rgba(76,175,80,0.4);
+    cursor: pointer;
+    transition: all 0.3s ease;
 }
 
 /* ----------- 返回/關閉按鈕 ----------- */ 
@@ -165,8 +165,6 @@ body {
 </div>
 
 <!-- 下一頁箭頭 -->
-    <div class="arrow-button">
-      <a class="arrow-right" onclick="location.href='changecardpi1.html'">&#9654;</a>
-    </div>
+   <div class="arrow-button arrow-right" onclick="location.href='changecardpi1.html'">&#9654;</div>
 </body>
 </html>
