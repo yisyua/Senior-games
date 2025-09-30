@@ -3,778 +3,401 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-    <title>遊戲結果</title>
+    <title>遊戲結果 - 記憶翻牌</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@500;700;900&display=swap" rel="stylesheet">
     <style>
-        /* CSS 重置與基礎樣式 */
+        /* --- 全局設定與背景 --- */
         * {
             box-sizing: border-box;
             margin: 0;
             padding: 0;
         }
 
-        html, body {
-            height: 100%;
-            overflow-x: hidden;
-            font-family: 'Microsoft JhengHei', 'PingFang TC', sans-serif;
-        }
-
         body {
-            /* 深灰漸層背景 */
-            background: linear-gradient(135deg, #2d3436 0%, #636e72 100%);
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Microsoft JhengHei", "PingFang TC", "Noto Sans TC", sans-serif;
+            background-color: #e8f5e9; /* 淺綠色背景 */
+            color: #333;
+            min-height: 100vh;
             display: flex;
             justify-content: center;
             align-items: center;
-            padding: 30px;
-            min-height: 100vh;
+            padding: 1rem;
             position: relative;
-            overflow: hidden;
         }
-
-        /* 幾何背景動畫樣式 */
-        .geometric-bg {
+        
+        /* 增加綠色光點背景效果 */
+        body::before {
+            content: '';
             position: absolute;
+            top: 0;
+            left: 0;
             width: 100%;
             height: 100%;
-            opacity: 0.1;
+            background: 
+                radial-gradient(circle at 10% 90%, rgba(76, 175, 80, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 90% 10%, rgba(129, 199, 132, 0.15) 0%, transparent 50%);
             pointer-events: none;
             z-index: 0;
         }
 
-        .circle {
-            position: absolute;
-            border: 2px solid #dfe6e9;
-            border-radius: 50%;
-            animation: rotate 20s linear infinite;
-        }
-
-        @keyframes rotate {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
-        .particle {
-            position: absolute;
-            width: 4px;
-            height: 4px;
-            background: #b2bec3;
-            border-radius: 50%;
-            animation: float-particle 15s infinite;
-        }
-
-        @keyframes float-particle {
-            0%, 100% { 
-                transform: translate(0, 0);
-                opacity: 0.3;
-            }
-            50% { 
-                transform: translate(100px, -100px);
-                opacity: 0.8;
-            }
-        }
-
-        /* 主容器與標題樣式 */
+        /* --- 主要內容容器 --- */
         .container {
-            background: rgba(255, 255, 255, 0.95);
-            border-radius: 30px;
-            padding: 40px 50px;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.3), 0 0 0 1px rgba(255,255,255,0.1);
-            /* 調整初始 max-width，讓它在預設狀態 (只顯示 Summary) 時小一些 */
-            max-width: 450px; 
-            width: 95%;
+            background-color: #ffffff;
+            padding: 40px;
+            border-radius: 25px;
+            width: 100%;
+            max-width: 650px;
+            text-align: center;
+            box-shadow: 0 15px 30px rgba(46, 125, 50, 0.2);
             position: relative;
             z-index: 1;
-            /* **新增：** 過渡效果，使 max-width 變化時有動畫 */
-            transition: max-width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-
-        /* 點擊後放大，允許更大空間來容納並排的詳細結果 */
-        .container.expanded {
-            max-width: 1000px; 
+            transform: translateY(0);
+            transition: transform 0.3s ease-out;
         }
 
         h1 {
-            color: #2d3436;
-            font-size: 48px;
-            margin-bottom: 40px;
+            font-size: 3rem;
+            margin-bottom: 30px;
+            color: #388e3c; /* 較深的綠色標題 */
             font-weight: 700;
-            letter-spacing: 8px;
-            position: relative;
-            padding-bottom: 20px;
-            text-align: center;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.05);
+            font-family: 'Noto Serif TC', serif;
         }
 
-        h1::after {
-            content: '';
-            position: absolute;
-            bottom: 0;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 100px;
-            height: 4px;
-            background: linear-gradient(90deg, transparent, #636e72, transparent);
-            animation: line-expand 2s ease-in-out infinite;
-        }
-
-        @keyframes line-expand {
-            0%, 100% { width: 100px; }
-            50% { width: 200px; }
-        }
-
-        /* 核心佈局：總結與詳細結果並排 (預設只在展開時使用) */
-        .content-wrapper {
-            display: flex;
-            gap: 40px;
-            align-items: flex-start;
-            margin-bottom: 40px;
-            /* 預設為垂直，避免未展開時的空間問題 */
-            flex-direction: column; 
-        }
-        
-        /* 展開時才並排 */
-        .container.expanded .content-wrapper {
-            flex-direction: row; 
-        }
-
-        /* 總結數據區塊 (左側卡片) */
-        .summary {
-            /* 調整尺寸，預設佔滿寬度 */
-            flex: 0 0 auto; 
-            width: 100%;
-            background: linear-gradient(135deg, #636e72 0%, #2d3436 100%);
-            color: white;
-            padding: 30px;
-            border-radius: 20px;
-            box-shadow: 0 10px 20px rgba(45, 52, 54, 0.3);
-            position: relative;
-            overflow: hidden;
-            min-width: 250px; 
-            /* **新增：** 過渡效果，使寬度變化時有動畫 */
-            transition: flex-basis 0.6s cubic-bezier(0.4, 0, 0.2, 1), width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-        
-        /* 展開時：summary 固定寬度 300px */
-        .container.expanded .summary {
-            flex: 0 0 300px; 
-            width: 300px;
-        }
-
-        .summary::before {
-            content: '';
-            position: absolute;
-            inset: 0;
-            background: linear-gradient(135deg, rgba(255,255,255,0.1), rgba(255,255,255,0));
-            pointer-events: none;
-        }
-
-        .summary > div {
-            font-size: 1.6rem;
-            margin-bottom: 18px;
-            position: relative;
-            padding-left: 10px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .summary > div:last-child {
-            margin-bottom: 0;
-        }
-
-        .summary strong {
-            color: #fff;
-            font-weight: 700;
-        }
-
-        .summary span {
-            color: #dfe6e9;
-            font-weight: 600;
-            font-size: 1.8rem;
-        }
-
-        /* 詳細結果區塊 (右側卡片) */
-        .result-container {
-            /* **修改：** 預設隱藏，只在 JS 切換 class 時顯示 */
-            display: none; 
-            flex: 1; 
-            animation: fadeIn 0.5s ease 0.3s forwards; /* 延遲動畫，等容器放大完成 */
-            opacity: 0;
-        }
-        
-        /* 展開時：強制顯示 */
-        .container.expanded .result-container {
-            display: block;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        /* 內部的三欄式佈局：將三關數據並排放置 */
+        /* --- 結果總結區塊 --- */
         .result-box1 {
-            background: #f8f9fa;
-            padding: 30px;
-            border-radius: 20px;
-            border: 2px solid #e9ecef;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-            display: grid; 
-            grid-template-columns: repeat(3, 1fr); 
-            gap: 20px;
+            background: linear-gradient(135deg, #a5d6a7, #66bb6a); /* 綠色漸層 */
+            color: #fff;
+            padding: 25px;
+            border-radius: 18px;
+            margin-bottom: 25px;
+            font-weight: bold;
+            box-shadow: 0 8px 15px rgba(76, 175, 80, 0.4);
         }
 
-        .level-group {
-            background: white;
+        .result-box1 div {
+            font-size: 1.6rem;
+            margin: 10px 0;
+        }
+
+        .result-box1 span {
+            font-size: 2.5rem; /* 突顯總數據 */
+            display: inline-block;
+            margin-left: 10px;
+        }
+
+        /* --- 詳細數據區塊 (預設隱藏) --- */
+        .result-box-detail {
+            background-color: #f8fcf8;
+            color: #555;
             padding: 20px;
-            border-radius: 12px;
-            border: 2px solid #e9ecef;
+            border-radius: 15px;
+            margin-top: 20px;
+            border: 1px solid #dcdcdc;
+            text-align: left;
+            font-size: 1.2rem;
             transition: all 0.3s ease;
         }
 
-        .level-group:hover {
-            border-color: #636e72;
-            transform: translateY(-5px);
-            box-shadow: 0 8px 20px rgba(99, 110, 114, 0.2);
-        }
-
-        .level-title {
-            font-size: 1.4rem;
+        .result-box-detail strong {
+            color: #388e3c;
             font-weight: 700;
-            color: #2d3436;
-            margin-bottom: 15px;
-            padding-bottom: 10px;
-            border-bottom: 2px solid #636e72;
-            text-align: center;
         }
-
-        .level-group > div {
-            font-size: 1.2rem;
-            margin-bottom: 8px;
-            color: #2d3436;
-            padding: 5px 0;
-        }
-
-        .level-group > div:last-child {
-            margin-bottom: 0;
-        }
-
-        .level-group strong {
-            color: #636e72;
-            font-weight: 600;
-            display: inline-block;
-            min-width: 60px;
-            text-align: left;
-        }
-
-        /* 按鈕樣式 (維持不變) */
-        #show-details-btn {
-            padding: 18px 40px;
-            font-size: 1.5rem;
-            border: 2px solid #636e72;
-            border-radius: 15px;
+        
+        /* 顯示/隱藏詳細數據的按鈕 */
+        #toggleDetailBtn {
+            font-size: 1rem;
+            padding: 8px 15px;
+            background-color: #e0e0e0;
+            color: #555;
+            border: none;
+            border-radius: 10px;
             cursor: pointer;
-            font-weight: 600;
-            background: white;
-            color: #636e72;
-            letter-spacing: 2px;
-            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-            position: relative;
-            overflow: hidden;
+            margin-top: 15px;
+            transition: background-color 0.2s;
             display: block;
-            margin: 0 auto 30px;
-        }
-
-        #show-details-btn::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
             width: 100%;
-            height: 100%;
-            background: linear-gradient(135deg, #636e72 0%, #4a5458 100%);
-            transition: left 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-            z-index: 0;
+        }
+        #toggleDetailBtn:hover {
+            background-color: #ccc;
         }
 
-        #show-details-btn span {
-            position: relative;
-            z-index: 1;
-            transition: color 0.4s ease;
-        }
-
-        #show-details-btn:hover {
-            border-color: #4a5458;
-            box-shadow: 0 10px 30px rgba(99, 110, 114, 0.4);
-            transform: translateY(-3px);
-        }
-
-        #show-details-btn:hover::before {
-            left: 0;
-        }
-
-        #show-details-btn:hover span {
-            color: white;
-        }
-
+        /* --- 按鈕區塊 --- */
         .buttons {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 20px;
-            justify-content: center;
+            display: block; /* 改為 block 方便單一按鈕置中 */
+            margin-top: 30px;
         }
-
-        .buttons button {
-            flex: 1 1 200px;
-            max-width: 280px;
-            padding: 20px 30px;
-            font-size: 1.5rem;
-            font-weight: 600;
-            border: 2px solid;
+        
+        /* 統一設定按鈕樣式 */
+        .next-game-btn { /* 新增 class 名稱 */
+            font-size: 1.5rem; /* 稍微大一點 */
+            padding: 15px 30px;
+            border: none;
             border-radius: 15px;
             cursor: pointer;
-            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-            letter-spacing: 2px;
-            position: relative;
-            overflow: hidden;
-            background: white;
-        }
-
-        .buttons button::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            transition: left 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-            z-index: 0;
-        }
-
-        .buttons button span {
-            position: relative;
-            z-index: 1;
-            transition: color 0.4s ease;
-        }
-
-        /* 練習按鈕 */
-        #test {
-            color: #2d3436;
-            border-color: #2d3436;
-        }
-        #test::before {
-            background: linear-gradient(135deg, #2d3436 0%, #1a1f20 100%);
-        }
-        #test:hover {
-            border-color: #1a1f20;
-            box-shadow: 0 10px 30px rgba(45, 52, 54, 0.4);
-            transform: translateY(-3px);
-        }
-        #test:hover::before {
-            left: 0;
-        }
-        #test:hover span {
+            font-weight: bold;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            text-transform: none;
+            white-space: nowrap;
+            /* 下一個遊戲按鈕的樣式 */
+            background-color: #4caf50; /* 成功綠 */
             color: white;
+            width: 100%; /* 讓它佔滿寬度 */
+            max-width: 400px; /* 限制最大寬度，避免過寬 */
+            margin: 0 auto; /* 置中 */
+            display: block;
+        }
+        
+        .next-game-btn:hover {
+            background-color: #388e3c;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15);
         }
 
-        /* 測試按鈕 */
-        #test2 {
-            color: #636e72;
-            border-color: #636e72;
-        }
-        #test2::before {
-            background: linear-gradient(135deg, #636e72 0%, #4a5458 100%);
-        }
-        #test2:hover {
-            border-color: #4a5458;
-            box-shadow: 0 10px 30px rgba(99, 110, 114, 0.4);
-            transform: translateY(-3px);
-        }
-        #test2:hover::before {
-            left: 0;
-        }
-        #test2:hover span {
-            color: white;
+        /* --- 用戶資訊 (隱藏) --- */
+        .user-info {
+            /* 保持原樣式但強制隱藏 */
+            display: none !important; 
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            font-size: 1.2rem;
+            background-color: #ffffffed;
+            padding: 12px 20px;
+            border-radius: 15px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            align-items: center;
+            max-width: 350px;
+            z-index: 10;
         }
 
-        /* 下一關按鈕 */
-        #play {
-            color: #b2bec3;
-            border-color: #b2bec3;
-        }
-        #play::before {
-            background: linear-gradient(135deg, #b2bec3 0%, #8f9da6 100%);
-        }
-        #play:hover {
-            border-color: #8f9da6;
-            box-shadow: 0 10px 30px rgba(178, 190, 195, 0.4);
-            transform: translateY(-3px);
-        }
-        #play:hover::before {
-            left: 0;
-        }
-        #play:hover span {
-            color: white;
-        }
 
-        .buttons button:active {
-            transform: translateY(0px);
-        }
-
-        /* 響應式設計 (RWD) */
-
-        /* 平板電腦 (1024px 以下) */
-        @media (max-width: 1024px) {
-            .content-wrapper {
-                /* 變為垂直堆疊 */
-                flex-direction: column; 
-            }
-            
-            /* 即使展開，由於寬度限制，仍然保持垂直堆疊，但結果框要顯示 */
-            .container.expanded .content-wrapper {
-                 flex-direction: column;
-            }
-
-            .container.expanded {
-                 max-width: 700px; /* 在平板上稍微放大 */
-            }
-
-            .summary {
-                /* 佔滿寬度 */
-                flex: 0 0 auto;
-                width: 100%;
-            }
-            
-            .container.expanded .summary {
-                flex: 0 0 auto;
-                width: 100%;
-            }
-
-            .result-box1 {
-                /* 三欄 grid 變回一欄垂直堆疊 */
-                grid-template-columns: 1fr; 
-            }
-        }
-
-        /* 手機 (768px 以下) */
-        @media (max-width: 768px) {
+        /* RWD 調整 */
+        @media (max-width: 600px) {
             .container {
                 padding: 30px 20px;
-                max-width: 95%; /* 手機上不再放大，保持 95% 寬度 */
+                max-width: 95%;
             }
-            
-            .container.expanded {
-                 max-width: 95%; 
-            }
-
             h1 {
-                font-size: 32px;
-                margin-bottom: 30px;
-                letter-spacing: 4px;
+                font-size: 2.5rem;
             }
-
-            .content-wrapper {
-                gap: 20px;
+            .result-box1 span {
+                font-size: 2rem;
             }
-
-            .summary {
-                padding: 20px;
+            .result-box1 div {
+                font-size: 1.4rem;
             }
-
-            .summary > div {
-                font-size: 1.3rem;
-                margin-bottom: 12px;
-            }
-
-            .summary span {
-                font-size: 1.5rem;
-            }
-
-            #show-details-btn {
-                font-size: 1.2rem;
-                padding: 15px 30px;
-            }
-
-            .result-box1 {
-                padding: 20px;
-                gap: 15px;
-            }
-
-            .level-group {
-                padding: 15px;
-            }
-
-            .level-title {
-                font-size: 1.2rem;
-            }
-
-            .level-group > div {
-                font-size: 1.1rem;
-            }
-
             .buttons {
-                gap: 15px;
+                margin-top: 20px;
             }
-
-            .buttons button {
-                font-size: 1.2rem;
-                padding: 15px 25px;
-                flex: 1 1 140px;
+            .next-game-btn {
+                font-size: 1.3rem;
+                padding: 15px;
             }
         }
     </style>
 </head>
 <body onload="end()">
-    <div class="geometric-bg" id="geometric"></div>
-
-    <div class="container" id="mainContainer">
-        <h1>遊戲結果</h1>
-
-        <div class="content-wrapper">
-            <div class="summary" id="summaryBox" style="display: none;">
-                <div>總用時: <span id="usedTime"></span> 秒</div>
-                <div>總點擊錯誤: <span id="totalWrong"></span> 次</div>
-                <div>總提醒次數: <span id="totalHints"></span> 次</div>
+    <div class="user-info" title="用戶資訊" style="display: none;"> 
+        <span id="username"></span>
+        <button onclick="logout()">登出</button>
+    </div>
+    
+    <div class="container">
+        <h1>記憶翻牌挑戰 - 結算</h1>
+        
+        <div class="result-box1">
+            <div>🎉 您的總成績 🎉</div>
+            <div>
+                總用時：<span id="totalTime">0</span> 秒
             </div>
-
-            <div class="result-container" id="resultContainer">
-                <div class="result-box1">
-                    <div class="level-group">
-                        <div class="level-title">第一關</div>
-                        <div><strong>用時:</strong> <span id="time1"></span> 秒</div>
-                        <div><strong>錯誤:</strong> <span id="wrong1"></span> 次</div>
-                        <div><strong>提示:</strong> <span id="hint1"></span> 次</div>
-                    </div>
-
-                    <div class="level-group">
-                        <div class="level-title">第二關</div>
-                        <div><strong>用時:</strong> <span id="time2"></span> 秒</div>
-                        <div><strong>錯誤:</strong> <span id="wrong2"></span> 次</div>
-                        <div><strong>提示:</strong> <span id="hint2"></span> 次</div>
-                    </div>
-
-                    <div class="level-group">
-                        <div class="level-title">第三關</div>
-                        <div><strong>用時:</strong> <span id="time3"></span> 秒</div>
-                        <div><strong>錯誤:</strong> <span id="wrong3"></span> 次</div>
-                        <div><strong>提示:</strong> <span id="hint3"></span> 次</div>
-                    </div>
-                </div>
+            <div>
+                總提醒次數：<span id="totalCount">0</span> 次
             </div>
         </div>
-
-        <button id="show-details-btn" style="display: none;" onclick="toggleResult()">
-            <span>查看詳細結果</span>
-        </button>
+        
+        <button id="toggleDetailBtn" onclick="toggleDetail()">顯示詳細數據</button>
+        <div class="result-box-detail" id="detailBox" style="display: none;">
+            <div>關卡 1 (4對卡牌) 用時：<strong id="timeL1">0</strong> 秒 / 提醒次數：<strong id="countL1">0</strong> 次</div>
+            <div>關卡 2 (6對卡牌) 用時：<strong id="timeL2">0</strong> 秒 / 提醒次數：<strong id="countL2">0</strong> 次</div>
+            <div>關卡 3 (8對卡牌) 用時：<strong id="timeL3">0</strong> 秒 / 提醒次數：<strong id="countL3">0</strong> 次</div>
+        </div>
 
         <div class="buttons">
-            <button onclick="goToPractice()" id="test" style="display: none;">
-                <span>再練習</span>
-            </button>
-            <button onclick="goToTest()" id="test2" style="display: none;">
-                <span>進入測試</span>
-            </button>
-            <button onclick="location.href='../number/numberstart.html';" id="play" style="display: none;">
-                <span>下一關</span>
-            </button>
+             <button class="next-game-btn" onclick="goToNextGame()">下一個遊戲</button> 
         </div>
     </div>
 
     <script>
-        // 背景動畫 (保持不變)
-        const geometricBg = document.getElementById('geometric');
+    // 讀取用戶資訊
+    const username = localStorage.getItem("nickname") || "訪客";
+    const hobby = localStorage.getItem("other") || localStorage.getItem("hobby");
 
-        const circlesData = [
-            { left: '5%', top: '10%', size: 250, duration: 20, delay: 0 },
-            { left: '80%', top: '15%', size: 300, duration: 25, delay: 3 },
-            { left: '20%', top: '70%', size: 220, duration: 22, delay: 2 },
-            { left: '70%', top: '60%', size: 280, duration: 18, delay: 1 },
-            { left: '40%', top: '40%', size: 260, duration: 24, delay: 4 },
+    // 獲取各關卡總時間（秒）
+    const getTime1 = localStorage.getItem("reminderTime") ? parseInt(localStorage.getItem("reminderTime")) : 0;
+    const getTime2 = localStorage.getItem("reminderTime2") ? parseInt(localStorage.getItem("reminderTime2")) : 0;
+    const getTime3 = localStorage.getItem("reminderTime3") ? parseInt(localStorage.getItem("reminderTime3")) : 0;
+
+    // 修正提醒次數的讀取邏輯
+    function getReminderCount(level) {
+        // 檢查多種可能的鍵名格式
+        const possibleKeys = [
+            `reminderCount${level === 1 ? '' : level === 2 ? '1' : '2'}`, // 原邏輯
+            `reminderCount_level${level}`, // 可能的格式
+            `reminderCount${level}`, // 另一種可能格式
+            `level${level}_reminderCount` // 又一種可能格式
         ];
-
-        circlesData.forEach((c, index) => {
-            const circle = document.createElement('div');
-            circle.className = 'circle';
-            circle.style.width = c.size + 'px';
-            circle.style.height = c.size + 'px';
-            circle.style.left = c.left;
-            circle.style.top = c.top;
-            circle.style.animationDuration = c.duration + 's';
-            circle.style.animationDelay = c.delay + 's';
-            geometricBg.appendChild(circle);
-            animateCircle(circle, index);
-        });
-
-        function animateCircle(circle, index) {
-            const moveTime = 8000 + (index * 1000);
-
-            function move() {
-                const currentLeft = parseFloat(circle.style.left);
-                const currentTop = parseFloat(circle.style.top);
-
-                const newLeft = currentLeft + (Math.random() - 0.5) * 5;
-                const newTop = currentTop + (Math.random() - 0.5) * 5;
-
-                circle.style.transition = `left ${moveTime}ms ease-in-out, top ${moveTime}ms ease-in-out`;
-                circle.style.left = Math.max(0, Math.min(95, newLeft)) + '%';
-                circle.style.top = Math.max(0, Math.min(95, newTop)) + '%';
+        
+        for (let key of possibleKeys) {
+            const value = localStorage.getItem(key);
+            if (value !== null && !isNaN(parseInt(value))) {
+                console.log(`找到提醒次數 關卡${level}: ${key} = ${value}`);
+                return parseInt(value);
             }
+        }
+        
+        console.log(`未找到關卡${level}的提醒次數記錄`);
+        return 0;
+    }
 
-            setInterval(move, moveTime);
+    // 獲取各關卡提醒次數 - 使用修正後的邏輯
+    const getCount1 = getReminderCount(1);
+    const getCount2 = getReminderCount(2);
+    const getCount3 = getReminderCount(3);
+
+    // 總計
+    const totalTime = getTime1 + getTime2 + getTime3;
+    const totalCount = getCount1 + getCount2 + getCount3;
+
+    // 將 level 改為可變動的變數
+    let level = localStorage.getItem("test") || "練習";
+
+    // 顯示或隱藏詳細數據
+    function toggleDetail() {
+        const detailBox = document.getElementById("detailBox");
+        const button = document.getElementById("toggleDetailBtn");
+        if (detailBox.style.display === "none") {
+            detailBox.style.display = "block";
+            button.textContent = "隱藏詳細數據";
+        } else {
+            detailBox.style.display = "none";
+            button.textContent = "顯示詳細數據";
+        }
+    }
+
+    // 進入下一個遊戲的函數
+    function goToNextGame() {
+        // 確保測驗模式的數據在跳轉前儲存
+        if (level === "測驗" && getTime1 > 0 && getTime2 > 0 && getTime3 > 0) {
+            saveGameResult(); 
+        } else {
+             // 非測驗模式或數據不全，也清除單次遊戲數據
+            clearGameData();
+        }
+        // 清除測驗模式標記，確保下次進入遊戲是練習模式
+        localStorage.removeItem("test"); 
+        
+        // 跳轉到下一個遊戲的 Home screen
+        location.href='../sky lantern/Home screen.html';
+    }
+
+    // 顯示遊戲結果
+    function end() {
+        // 顯示用戶名 (雖然區塊被隱藏，但數據仍在變數中)
+        document.getElementById("username").textContent = `您好，${username}`;
+
+        // 顯示總結數據
+        document.getElementById("totalTime").textContent = totalTime;
+        document.getElementById("totalCount").textContent = totalCount;
+        
+        // 顯示詳細關卡數據
+        document.getElementById("timeL1").textContent = getTime1;
+        document.getElementById("countL1").textContent = getCount1;
+        document.getElementById("timeL2").textContent = getTime2;
+        document.getElementById("countL2").textContent = getCount2;
+        document.getElementById("timeL3").textContent = getTime3;
+        document.getElementById("countL3").textContent = getCount3;
+        
+        // 測驗模式完成時儲存數據 (即使沒有「下一關」按鈕，數據也應在完成時儲存)
+        if (level === "測驗" && getTime1 > 0 && getTime2 > 0 && getTime3 > 0) {
+            // saveGameResult() 會在 goToNextGame() 中呼叫
+            console.log("測驗模式數據完整，將在跳轉下一關時儲存並清除單次遊戲數據。");
+        } else if (level === "測驗") {
+            // 測驗模式數據不完整，清除現有數據，避免錯誤累積
+            console.log("測驗模式數據不完整，清除單次遊戲數據。");
+            clearGameData();
+        }
+        // 練習模式則不儲存，直接跳轉即可
+    }
+
+    // 載入時執行一次
+    window.onload = end;
+
+    // 儲存遊戲結果到多表模式 (僅限測驗模式完成時)
+    function saveGameResult() {
+        // ... (保持原有的 saveGameResult 邏輯)
+        const newRecord = {
+            遊戲玩家名稱: username,
+            嗜好: hobby,
+            遊戲名稱: "翻牌",
+            第一關用時: getTime1,
+            第一關提醒次數: getCount1,
+            第二關用時: getTime2,
+            第二關提醒次數: getCount2,
+            第三關用時: getTime3,
+            第三關提醒次數: getCount3,
+            總時間加總: totalTime,
+            總提醒次數: totalCount,
+            完成時間: new Date().toLocaleString()
+        };
+
+        const dateStr = new Date().toISOString().slice(0, 10);
+        const tableKey = `flipcard_測驗_${dateStr}`;
+
+        let tableList = JSON.parse(localStorage.getItem("flipCardTables") || "[]");
+
+        if (!tableList.includes(tableKey)) {
+            tableList.push(tableKey);
+            localStorage.setItem("flipCardTables", JSON.stringify(tableList));
         }
 
-        const particlesData = [
-            { left: '10%', top: '20%', duration: 15, delay: 0 },
-            { left: '25%', top: '80%', duration: 18, delay: 1 },
-            { left: '60%', top: '30%', duration: 16, delay: 2 },
-            { left: '85%', top: '70%', duration: 20, delay: 3 },
-            { left: '40%', top: '50%', duration: 17, delay: 4 },
-            { left: '70%', top: '20%', duration: 19, delay: 2 },
-            { left: '15%', top: '60%', duration: 15, delay: 1 },
-            { left: '50%', top: '10%', duration: 16, delay: 0 },
-            { left: '30%', top: '35%', duration: 18, delay: 2 },
-            { left: '80%', top: '50%', duration: 20, delay: 3 },
+        let oldRecords = JSON.parse(localStorage.getItem(tableKey) || "[]");
+        oldRecords.push(newRecord);
+
+        localStorage.setItem(tableKey, JSON.stringify(oldRecords));
+        console.log("測驗結果已儲存:", newRecord);
+        
+        // 測驗模式完成後，清除單次遊戲數據
+        clearGameData();
+    }
+
+    // 清除單次遊戲相關暫存
+    function clearGameData() {
+        // ... (保持原有的 clearGameData 邏輯)
+        const keysToRemove = [
+            "reminderTime", "reminderTime2", "reminderTime3",
+            "reminderCount", "reminderCount1", "reminderCount2",
+            "reminderCount_level1", "reminderCount_level2", "reminderCount_level3",
+            "level1_reminderCount", "level2_reminderCount", "level3_reminderCount"
         ];
-
-        particlesData.forEach(p => {
-            const particle = document.createElement('div');
-            particle.className = 'particle';
-            particle.style.left = p.left;
-            particle.style.top = p.top;
-            particle.style.animationDuration = p.duration + 's';
-            particle.style.animationDelay = p.delay + 's';
-            geometricBg.appendChild(particle);
+        
+        keysToRemove.forEach(key => {
+            localStorage.removeItem(key);
         });
+        localStorage.removeItem("test"); // 清除模式標記
+    }
 
-        // 按鈕點擊效果 (保持不變)
-        document.querySelectorAll('.buttons button, #show-details-btn').forEach(btn => {
-            btn.addEventListener('click', function(e) {
-                const rect = this.getBoundingClientRect();
-                const x = e.clientX - rect.left;
-                const y = e.clientY - rect.top;
-                const ripple = document.createElement('div');
-                ripple.style.position = 'absolute';
-                ripple.style.left = x + 'px';
-                ripple.style.top = y + 'px';
-                ripple.style.width = '10px';
-                ripple.style.height = '10px';
-                ripple.style.borderRadius = '50%';
-                ripple.style.background = 'rgba(255,255,255,0.6)';
-                ripple.style.transform = 'translate(-50%,-50%)';
-                ripple.style.pointerEvents = 'none';
-                this.appendChild(ripple);
-                ripple.animate([
-                    {width:'10px', height:'10px', opacity:1},
-                    {width:'400px', height:'400px', opacity:0}
-                ], {duration:600, easing:'ease-out'}).onfinish = () => ripple.remove();
-            });
-        });
+    // 清除所有 localStorage 並跳轉登入頁 (僅用於登出，但現在登出已隱藏)
+    function clearData() {
+        localStorage.clear();
+    }
 
-        // 遊戲邏輯 (保持不變)
-        let level = localStorage.getItem("test");
+    function logout() {
+        clearData();
+        location.href = "../index.html";
+    }
 
-        const time1 = Number(localStorage.getItem("reminderTime") || 0);
-        const time2 = Number(localStorage.getItem("reminderTime2") || 0);
-        const time3 = Number(localStorage.getItem("reminderTime3") || 0);
-
-        const wrong1 = Number(localStorage.getItem("count2") || 0);
-        const wrong2 = Number(localStorage.getItem("count3") || 0);
-        const wrong3 = Number(localStorage.getItem("count4") || 0);
-
-        const hint1 = Number(localStorage.getItem("hintCount1") || 0);
-        const hint2 = Number(localStorage.getItem("hintCount2") || 0);
-        const hint3 = Number(localStorage.getItem("hintCount3") || 0);
-
-        function end() {
-            if (level === "測驗") {
-                document.getElementById("summaryBox").style.display = "block";
-                document.getElementById("usedTime").textContent = time1 + time2 + time3;
-                document.getElementById("totalWrong").textContent = wrong1 + wrong2 + wrong3;
-                document.getElementById("totalHints").textContent = hint1 + hint2 + hint3;
-
-                document.getElementById("time1").textContent = time1;
-                document.getElementById("time2").textContent = time2;
-                document.getElementById("time3").textContent = time3;
-
-                document.getElementById("wrong1").textContent = wrong1;
-                document.getElementById("wrong2").textContent = wrong2;
-                document.getElementById("wrong3").textContent = wrong3;
-
-                document.getElementById("hint1").textContent = hint1;
-                document.getElementById("hint2").textContent = hint2;
-                document.getElementById("hint3").textContent = hint3;
-
-                document.getElementById("show-details-btn").style.display = "block";
-                document.getElementById("play").style.display = "block";
-                document.getElementById("test").style.display = "none";
-                document.getElementById("test2").style.display = "none";
-                
-                // 初始狀態：詳細結果隱藏，容器未展開
-                document.getElementById("resultContainer").style.display = "none";
-                document.getElementById("mainContainer").classList.remove('expanded');
-
-            } else {
-                document.getElementById("summaryBox").style.display = "none";
-                document.getElementById("resultContainer").style.display = "none";
-                document.getElementById("show-details-btn").style.display = "none";
-                document.getElementById("test").style.display = "block";
-                document.getElementById("test2").style.display = "block";
-                document.getElementById("play").style.display = "none";
-                document.getElementById("mainContainer").classList.remove('expanded');
-            }
-        }
-
-        // **主要調整：** 根據展開狀態新增/移除 'expanded' Class
-        function toggleResult() {
-            const mainContainer = document.getElementById("mainContainer");
-            const resultContainer = document.getElementById("resultContainer");
-            const btn = document.getElementById("show-details-btn");
-            const btnSpan = btn.querySelector('span');
-            
-            // 檢查當前是否為展開狀態
-            const isExpanded = mainContainer.classList.contains('expanded');
-
-            if (isExpanded) {
-                // 隱藏詳細結果
-                resultContainer.style.opacity = 0; // 開始淡出
-                // 稍微延遲後切換 display (避免在收縮動畫中顯示結果)
-                setTimeout(() => {
-                    resultContainer.style.display = "none";
-                }, 400); 
-
-                // 移除 expanded class (容器開始收縮)
-                mainContainer.classList.remove('expanded');
-                btnSpan.textContent = "查看詳細結果";
-            } else {
-                // 顯示詳細結果
-                resultContainer.style.display = "block";
-                
-                // 新增 expanded class (容器開始放大)
-                mainContainer.classList.add('expanded');
-                btnSpan.textContent = "隱藏詳細結果";
-                
-                // fadeIn 動畫會接續在 CSS 過渡之後執行 (已在 CSS 中設定延遲)
-            }
-        }
-
-        function goToTest() {
-            localStorage.setItem("test", "測驗");
-            clearGame();
-            location.href = 'game/34.html';
-        }
-
-        function goToPractice() {
-            localStorage.setItem("test", "練習");
-            clearGame();
-            location.href = 'game/33.html';
-        }
-
-        function clearGame() {
-            const keys = [
-                "reminderTime", "reminderTime2", "reminderTime3",
-                "count2", "count3", "count4",
-                "hintCount1", "hintCount2", "hintCount3"
-            ];
-            keys.forEach(k => localStorage.removeItem(k));
-        }
     </script>
 </body>
 </html>
