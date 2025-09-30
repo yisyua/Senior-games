@@ -198,7 +198,7 @@
         }
 
         /* 導航按鈕通用樣式 */
-        .arrow-button, .arrow-button1, .back-button {
+        .arrow-button, .arrow-button1 {
             position: absolute;
             top: 50%;
             transform: translateY(-50%);
@@ -221,7 +221,7 @@
         }
 
         /* 懸停效果 (Hover Effect) */
-        .arrow-button:hover, .arrow-button1:hover, .back-button:hover {
+        .arrow-button:hover, .arrow-button1:hover {
             background: #636e72; 
             color: white;
             box-shadow: 0 8px 20px rgba(0,0,0,0.4);
@@ -240,21 +240,7 @@
             font-size: 32px;
         }
 
-        /* 3. 關閉按鈕 (X) */
-        .back-button {
-            top: 40px; 
-            left: 40px;
-            transform: none; /* 移除 Y 軸置中 */
-            width: 40px;
-            height: 40px;
-            font-size: 20px;
-            font-weight: 400;
-        }
-        /* 關閉按鈕懸停時 Y 軸不變 */
-        .back-button:hover {
-            transform: scale(1.1); 
-        }
-        
+    
         /* ------------------- 使用者資訊 (User Info) 樣式 ------------------- */
         /* 調整定位，使其不影響置中的卡片 */
         .user-info {
