@@ -1,10 +1,9 @@
 <!DOCTYPE html>
 <html lang="zh-Hant">
 <head>
-    <meta charset="UTF-8">
-    <title>圖片說明2</title>
-    <link rel="stylesheet" href="static/style7.css"> <!-- 引入CSS -->
-</head>
+  <meta charset="UTF-8">
+  <title>圖片說明2</title>
+  <link rel="stylesheet" href="static/style7.css"> <!-- 引入CSS -->
   <style>
     /* ----------- 背景設定 ----------- */
     body {
@@ -21,22 +20,6 @@
       padding: 0;
       position: relative;
       overflow-x: hidden;
-    }
-
-    /* ----------- 漂浮粒子 ----------- */
-    .floating-particles { position: fixed; top:0; left:0; width:100%; height:100%; pointer-events:none; z-index:1; }
-    .particle { position:absolute; width:8px; height:8px; border-radius:50%; background: radial-gradient(circle, rgba(76,175,80,0.8), rgba(129,199,132,0.4)); animation: float 8s ease-in-out infinite;}
-    .particle:nth-child(1){ left:10%; animation-delay:0s;}
-    .particle:nth-child(2){ left:25%; animation-delay:1s;}
-    .particle:nth-child(3){ left:40%; animation-delay:2s;}
-    .particle:nth-child(4){ left:55%; animation-delay:3s;}
-    .particle:nth-child(5){ left:70%; animation-delay:4s;}
-    .particle:nth-child(6){ left:85%; animation-delay:5s;}
-    @keyframes float {
-      0%,100% { transform: translateY(100vh) scale(0); opacity:0; }
-      10% { transform: translateY(90vh) scale(1); opacity:1; }
-      90% { transform: translateY(-10vh) scale(1); opacity:1; }
-      100% { transform: translateY(-20vh) scale(0); opacity:0; }
     }
 
     /* ----------- 半透明卡片容器 ----------- */
@@ -63,185 +46,62 @@
     /* ----------- 卡牌樣式 ----------- */
     button { background:none; border:none; padding:0; margin:10px; cursor:pointer;}
     button img { width:100px; height:100px; object-fit:contain; }
-    input[type="button"] { width:100px; height:100px; font-size:2rem; border-radius:15px; border:none; background:#f0f0f0; margin:10px; cursor:pointer; box-shadow:0 5px 10px rgba(0,0,0,0.1); }
-    input[type="button"]:hover, button:hover { transform: scale(1.05); transition: transform 0.2s; }
+    input[type="button"] {
+      width:100px; height:100px;
+      font-size:2rem; border-radius:15px; border:none;
+      background:#f0f0f0; margin:10px; cursor:pointer;
+      box-shadow:0 5px 10px rgba(0,0,0,0.1);
+    }
+    input[type="button"]:hover, button:hover {
+      transform: scale(1.05);
+      transition: transform 0.2s;
+    }
 
     h2 { color:#2e7d32; font-weight:700; margin-bottom:20px; }
 
-    /* ----------- 配對失敗訊息 ----------- */
-    #error-msg {
-      color: red;
-      font-size: 1.3rem;
-      font-weight: bold;
-      margin-top: 20px;
-      text-align: center;
-      display: block; /* 永遠顯示 */
-    }
-
     /* ----------- 箭頭美化 ----------- */
-   /* 箭頭美化 */
-.arrow-button {
-    position: fixed;   /* 固定定位 */
-    top: 50%;          /* 按鈕垂直置中 */
-           /* 距離視窗右邊 40px*/
-    z-index: 10;
-}
-
-
-.arrow-right {
-    display: flex; /* 彈性布局 */
-    justify-content: center;  /* 水平置中*/
-    align-items: center; /* 垂直置中 */
-    width: 70px;
-    height: 70px;
-    border-radius: 50%;  /* 圓形按鈕 */
-    background: linear-gradient(135deg, #66bb6a, #43a047); /* 漸層 */
-    color: white; /* 箭頭顏色*/
-    font-size: 2.2rem; /* 箭頭大小 */
-    right: 40px;
-    box-shadow: 0 10px 20px rgba(76,175,80,0.4); /* 陰影效果 */
-    cursor: pointer; /* 滑鼠變手指 */
-    transition: all 0.3s ease; /* 滑鼠 hover 過渡動畫 */
-}
-.arrow-left {
-    display: flex; /* 彈性布局 */
-    justify-content: center;  /* 水平置中*/
-    align-items: center; /* 垂直置中 */
-    width: 70px;
-    height: 70px;
-    border-radius: 50%;  /* 圓形按鈕 */
-    background: linear-gradient(135deg, #66bb6a, #43a047); /* 漸層 */
-    color: white; /* 箭頭顏色*/
-    font-size: 2.2rem; /* 箭頭大小 */
-    left: 40px;
-    box-shadow: 0 10px 20px rgba(76,175,80,0.4); /* 陰影效果 */
-    cursor: pointer; /* 滑鼠變手指 */
-    transition: all 0.3s ease; /* 滑鼠 hover 過渡動畫 */
-}
-
-/* ----------- 卡牌按鈕美化 ----------- */
-button, input[type="button"] {
-  background: linear-gradient(135deg, #66bb6a, #43a047);
-  border: none;
-  border-radius: 20px;
-  color: white;
-  font-size: 1.8rem;
-  font-weight: 600;
-  padding: 1rem 1.5rem;
-  margin: 10px;
-  cursor: pointer;
-  box-shadow: 0 6px 15px rgba(76,175,80,0.3);
-  transition: all 0.3s ease;
-  width: 120px;
-  height: 120px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
-button img {
-  width: 80px;
-  height: 80px;
-  object-fit: contain;
-}
-
-button:hover, input[type="button"]:hover {
-  transform: translateY(-5px) scale(1.05);
-  box-shadow: 0 12px 25px rgba(76,175,80,0.5);
-}
-
-/* ----------- 箭頭按鈕美化 ----------- */
-.arrow-left, .arrow-right {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  width: 80px;
-  height: 80px;
-  border-radius: 25px;
-  background: linear-gradient(135deg, #43a047, #1b5e20);
-  color: white;
-  font-size: 2.5rem;
-  box-shadow: 0 8px 20px rgba(76,175,80,0.4);
-  cursor: pointer;
-  transition: all 0.3s ease;
-}
-
-.arrow-left:hover, .arrow-right:hover {
-  transform: translateY(-3px) scale(1.1);
-  box-shadow: 0 12px 30px rgba(76,175,80,0.6);
-}
-
-/* ----------- 關閉 X 按鈕 ----------- */
-.arrow-button2 {
-  position: fixed;
-  top: 40px;
-  right: 40px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  width: 60px;
-  height: 60px;
-  border-radius: 25px;
-  background: linear-gradient(135deg, #ef5350, #b71c1c);
-  color: white;
-  font-size: 2rem;
-  font-weight: bold;
-  box-shadow: 0 5px 15px rgba(239,83,80,0.5);
-  cursor: pointer;
-  transition: all 0.3s ease;
-}
-
-.arrow-button2:hover {
-  transform: translateY(-3px) scale(1.1);
-  box-shadow: 0 10px 25px rgba(239,83,80,0.7);
-}
+    .arrow-button {
+      position: fixed;
+      top: 50%;
+      z-index: 10;
+    }
+    .arrow-right, .arrow-left {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      width: 70px;
+      height: 70px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #66bb6a, #43a047);
+      color: white;
+      font-size: 2.2rem;
+      box-shadow: 0 10px 20px rgba(76,175,80,0.4);
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+    .arrow-left { left: 40px; }
+    .arrow-right { right: 40px; }
 
   </style>
+</head>
 <body>
-    <h2>記憶翻牌</h2>
-    <form>
-        <button id="option1">
-          <img src="../changecard_pi3.PNG" alt="option1" width="100">
-        </button>
+  <div class="game-wrapper">
+    <div class="game-container">
+      <h2>記憶翻牌</h2>
+      <form>
+        <button id="option1"><img src="../changecard_pi3.PNG" alt="option1"></button>
         <input type="button" id="option2" value="?">
         <input type="button" id="option3" value="?">
         <input type="button" id="option4" value="?">
-        <button id="option5">
-          <img src="../changecard_pi3.PNG" alt="option5" width="100">
-        </button>
+        <button id="option5"><img src="../changecard_pi3.PNG" alt="option5"></button>
         <input type="button" id="option6" value="?">
-    </form>
-    <h2 style="color: green;">配對成功</h2>
-    <div class="arrow-button1">
-      <a class="arrow-left"  onclick="location.href='changecardpi1.html'"></a>
+      </form>
+      <h2 style="color: green;">配對成功</h2>
     </div>
-    <div class="arrow-button">
-      <a class="arrow-right"  onclick="location.href='../changecard.html'"></a>
-    </div>
-    <span class="arrow-button2" onclick="location.href='../changecardhead.html'">X</span>
-      <script>
-      const username = localStorage.getItem("nickname") || "訪客";
-      document.getElementById("username").textContent = `您好，${username}`;
+  </div>
 
-      function logout() {
-        localStorage.clear(); // 一鍵清除所有 localStorage 資料
-       location.href = "../../index.html"; // 替換成你的登入頁路徑
-      }
-        function exportGameData() {
-    const records = JSON.parse(localStorage.getItem("gameResults") || "[]");
-    if (records.length === 0) {
-      alert("沒有遊戲紀錄可匯出！");
-      return;
-    }
-
-    const ws = XLSX.utils.json_to_sheet(records);
-    const wb = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(wb, ws, "遊戲紀錄");
-    XLSX.writeFile(wb, "game_results.xlsx");
-
-    // 清空遊戲紀錄（如果你要保留就註解這行）
-    localStorage.removeItem("gameResults");
-  }
-    </script> 
+  <!-- 左右箭頭 -->
+  <div class="arrow-button arrow-left" onclick="location.href='changecardpi1.html'">&#9664;</div>
+  <div class="arrow-button arrow-right" onclick="location.href='../changecard.html'">&#9654;</div>
 </body>
 </html>
